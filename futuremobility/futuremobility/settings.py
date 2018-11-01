@@ -80,7 +80,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'futuremobility',
         'USER': 'ehuntley',
-        'PASSWORD': 'TNM!ch1ganKYmed!a',
+        'PASSWORD': PSQL_PASSWORD,
         'HOST': '18.85.45.120',
         'PORT': '5432',
     }
