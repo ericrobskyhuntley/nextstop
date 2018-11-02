@@ -13,6 +13,49 @@ black = [140, 255, 'black']
 
 interval = 35
 
+# Pantone P 14-8 C
+q1 = [(38, 90, 98), 'q1']
+# Pantone P 10-8 C
+q2 = [(43, 93, 99), 'q2']
+# Pantone P 56-8 C
+q3 = [(347, 92, 66), 'q3']
+# Pantone P 62-16 C
+q4 = [(341, 86, 83), 'q4']
+# Pantone P 92-7 C
+q5 = [(286, 63, 47), 'q5']
+# Pantone P 88-8 C
+q6 = [(302, 72, 57), 'q6']
+# Pantone P 111-16 C
+q7 = [(203, 100, 41), 'q7']
+# Pantone P 102-8 C
+q8 = [(216, 81, 62), 'q8']
+# Pantone P 131-16 C
+q9 = [(169, 100, 47), 'q9']
+# Pantone P 151-8 C
+q10 = [(117, 60, 71), 'q10']
+
+card_colors = [q1, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10]
+
+def question_test(img):
+    crop = img[y:y+interval, x:x+interval]
+    for i, (low, high, q) in enumerate(card_colors):
+        max_test = 0
+        mask_color = cv2.inRange(blur, low, high)
+        crop_mask = cv2.bitwise_and(blur, blur, mask=mask_color)
+        sum = np.sum(crop_mask)
+        if sum > max_test:
+            max_test = sum
+            max_idx = i
+    return card_colors[max_idx]
+
+def front_mask(img):
+    q = question_test(img)
+    mask = cv2.inRange(img, q[0], q[1])
+    mask_inv = cv2.bitwise_not(mask)
+    masked = cv2.bitwise_and(blur, blur, mask=mask_inv)
+    return masked
+
+
 def q1_get(dst):
     """
     """
@@ -118,10 +161,22 @@ def q4_get(dst):
     else:
         return "There was a problem"
 
-def image_process(path, b):
+def front_process(path, b):
     """
     """
     img = cv2.imread(path)
+    # Convert to HSV color space.
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    blur = cv2.blur(hsv,(b, b))
+    # Determine which color to mask and mask it.
+    mask = front_mask(blur)
+    return cv2.bitwise_and(blur, blur, mask=mask)
+
+def back_process(path, b):
+    """
+    """
+    img = cv2.imread(path)
+    # Convert to grayscale color space.
     gs = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.blur(gs,(b, b))
     mask_black = cv2.inRange(blur, black[0], black[1])
@@ -134,5 +189,5 @@ def image_process(path, b):
 def read_back(path):
     """
     """
-    card = image_process(path, 5)
+    card = back_process(path, 5)
     return [q1_get(card), q2_get(card), q3_get(card), q4_get(card)]
