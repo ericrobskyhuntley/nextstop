@@ -5,62 +5,60 @@ from math import floor
 import numpy as np
 import cv2
 
-MAX_FEATURES = 500
+MAX_FEATURES = 800
 GOOD_MATCH_PERCENT = 0.15
 
-# ECC as implemented appears to work more consistently on card fronts. Unsure if it's due to parameters or method suitability.
-
-def align_images_orb(im1, im2):
+def align_images_orb(im, ref):
     """
     Feature-based image alignment algorithm that finds homography using the ORB feature detector (Oriented Fast and Rotated Brief).
 
     Code is based on implementation found here: https://www.learnopencv.com/image-alignment-feature-based-using-opencv-c-python/
     """
     # Convert images to grayscale
-    im1_gray = cv2.cvtColor(im1, cv2.COLOR_BGR2GRAY)
-    im2_gray = cv2.cvtColor(im2, cv2.COLOR_BGR2GRAY)
+    im_gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+    ref_gray = cv2.cvtColor(ref, cv2.COLOR_BGR2GRAY)
     # Detect ORB features and compute descriptors.
     orb = cv2.ORB_create(MAX_FEATURES)
-    keypoints1, descriptors1 = orb.detectAndCompute(im1_gray, None)
-    keypoints2, descriptors2 = orb.detectAndCompute(im2_gray, None)
+    keypoints_im, descriptors_im = orb.detectAndCompute(im_gray, None)
+    keypoints_ref, descriptors_ref = orb.detectAndCompute(ref_gray, None)
     # Match features
     matcher = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
-    matches = matcher.match(descriptors1, descriptors2, None)
+    matches = matcher.match(descriptors_im, descriptors_ref, None)
     # Sort matches by score
     matches.sort(key=lambda x: x.distance, reverse=False)
     # Remove not good matches
     num_good_matches = int(len(matches) * GOOD_MATCH_PERCENT)
     matches = matches[:num_good_matches]
     # Draw top matchesints
-    im_matches = cv2.drawMatches(im1, keypoints1, im2, keypoints2, matches, None)
+    im_matches = cv2.drawMatches(im, keypoints_im, ref, keypoints_ref, matches, None)
     cv2.imwrite("matches.jpg", im_matches)
     # Extract location of good matches
-    points1 = np.zeros((len(matches), 2), dtype=np.float32)
-    points2 = np.zeros((len(matches), 2), dtype=np.float32)
+    points_im = np.zeros((len(matches), 2), dtype=np.float32)
+    points_ref = np.zeros((len(matches), 2), dtype=np.float32)
 
     for i, match in enumerate(matches):
-        points1[i, :] = keypoints1[match.queryIdx].pt
-        points2[i, :] = keypoints2[match.trainIdx].pt
+        points_im[i, :] = keypoints_im[match.queryIdx].pt
+        points_ref[i, :] = keypoints_ref[match.trainIdx].pt
 
     # Find homography
-    h, mask = cv2.findHomography(points1, points2, cv2.RANSAC)
+    h, mask = cv2.findHomography(points_im, points_ref, cv2.RANSAC)
     # Apply homography
-    height, width, channels = im2.shape
-    im1_reg = cv2.warpPerspective(im1, h, (width, height))
+    height, width, channels = ref.shape
+    im_align = cv2.warpPerspective(im, h, (width, height))
 
-    return im1_reg
+    return im_align
 
-def align_images_ecc(im1, im2):
+def align_images_ecc(im, ref):
     """
     Image alignment algorithm using enhanced correlation coefficient method (ECC), which is proposed in: Georgios D. Evangelidis and Emmanouil Z. Psarakis. 2008. "Parametric Image Alignment Using Enhanced Correlation Coefficient Maximization." IEEE Transactions on Pattern Analysis and Machine Intelligence 30 (10): 1-8.
 
     Code is based on implementation found here: https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
     """
     # Convert images to grayscale
-    im1_gray = cv2.cvtColor(im1,cv2.COLOR_BGR2GRAY)
-    im2_gray = cv2.cvtColor(im2,cv2.COLOR_BGR2GRAY)
-    # Find size of image1
-    sz = im1.shape
+    im_gray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
+    ref_gray = cv2.cvtColor(ref,cv2.COLOR_BGR2GRAY)
+    # Find size of ref
+    sz = ref.shape
     # Define the motion model
     warp_mode = cv2.MOTION_TRANSLATION
     # Define 2x3 or 3x3 matrices and initialize the matrix to identity
@@ -76,14 +74,37 @@ def align_images_ecc(im1, im2):
     # Define termination criteria
     criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, number_of_iterations,  termination_eps)
     # Run the ECC algorithm. The results are stored in warp_matrix.
-    (cc, warp_matrix) = cv2.findTransformECC (im1_gray,im2_gray,warp_matrix, warp_mode, criteria)
+    (cc, warp_matrix) = cv2.findTransformECC (ref_gray,im_gray,warp_matrix, warp_mode, criteria)
     if warp_mode == cv2.MOTION_HOMOGRAPHY :
         # Use warpPerspective for Homography
-        im2_aligned = cv2.warpPerspective (im2, warp_matrix, (sz[1],sz[0]), flags=cv2.INTER_LINEAR + cv2.WARP_INVERSE_MAP)
+        im_align = cv2.warpPerspective (im, warp_matrix, (sz[1],sz[0]), flags=cv2.INTER_LINEAR + cv2.WARP_INVERSE_MAP)
     else :
         # Use warpAffine for Translation, Euclidean and Affine
-        im2_aligned = cv2.warpAffine(im2, warp_matrix, (sz[1],sz[0]), flags=cv2.INTER_LINEAR + cv2.WARP_INVERSE_MAP)
-    return im2_aligned
+        im_align = cv2.warpAffine(im, warp_matrix, (sz[1],sz[0]), flags=cv2.INTER_LINEAR + cv2.WARP_INVERSE_MAP)
+    return im_align
+
+
+front_ref = cv2.imread('assets/focus_group/templates/q1_f2_front.jpg')
+back_ref = cv2.imread('assets/focus_group/templates/back.jpg')
+
+import glob
+path = 'assets/focus_group/q1/f2/'
+card_backs = glob.glob1(path,'*back.png')
+card_fronts = glob.glob1(path,'*front.png')
+card_backs
+for card in card_backs:
+    path = 'assets/focus_group/q1/f2/'
+    back_img = cv2.imread(path + card)
+    back_align = align_images_orb(back_img, back_ref)
+    path = 'assets/focus_group/q1/orb/'
+    cv2.imwrite(path + card, back_align)
+
+for card in card_fronts:
+    path = 'assets/focus_group/q1/f2/'
+    front_img = cv2.imread(path + card)
+    front_align = align_images_orb(front_img, front_ref)
+    path = 'assets/focus_group/q1/orb/'
+    cv2.imwrite(path + card, front_align)
 
 def bg_trim(im):
     """

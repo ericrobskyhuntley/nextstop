@@ -38,22 +38,22 @@ class Response(models.Model):
     gender = models.CharField(max_length=200, choices=GENDERS,
         default=N, help_text='Gender identity.')
 
-    A = 'less-18'
+    A = 'under-18'
     B = '18-24'
     C = '25-34'
     D = '35-44'
     E = '45-54'
     F = '55-64'
-    G = 'more-65'
+    G = '65-plus'
 
     AGES = (
-        (A, 'Less than 18.'),
+        (A, 'Under 18.'),
         (B, '18-24'),
         (C, '25-34'),
         (D, '35-44'),
         (E, '45-54'),
         (F, '55-64'),
-        (G, 'Greater than 65.')
+        (G, '65+.')
     )
 
     age = models.CharField(max_length=25, choices=AGES, default=C, help_text='Age classes.')
@@ -65,17 +65,19 @@ class Response(models.Model):
     HOMES = (
         (U, 'Urban'),
         (S, 'Suburban'),
-        (N, 'Nonbinary'),
+        (R, 'Rural'),
     )
 
-    zip_code = models.CharField(max_length=5, null=True, help_text='ZIP code.')
+    zip_code = models.CharField(max_length=10, null=True, help_text='ZIP code.')
     home = models.CharField(max_length=10, choices=HOMES, default=U,
         help_text='Type of location respondant calls home.')
     survey = models.ForeignKey('Survey', on_delete=models.SET_NULL, null=True,
         help_text='Survey name.')
     timestamp = models.DateTimeField(auto_now_add=True,
         help_text='Timestamp of scan.')
-    scan = models.CharField(max_length=200, null=True,
+    front = models.CharField(max_length=200, null=True,
+        help_text='Path to full card scan.')
+    back = models.CharField(max_length=200, null=True,
         help_text='Path to full card scan.')
 
     def __str__(self):

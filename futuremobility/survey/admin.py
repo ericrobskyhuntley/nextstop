@@ -7,7 +7,7 @@ class SurveyAdmin(admin.ModelAdmin):
 admin.site.register(Survey, SurveyAdmin)
 
 class ResponseAdmin(admin.ModelAdmin):
-    list_display = ('id', 'timestamp', 'q', 'a', 'scan')
+    list_display = ('id', 'timestamp', 'q', 'a', 'front', 'back')
 admin.site.register(Response, ResponseAdmin)
 
 class QuestionAdmin(admin.ModelAdmin):

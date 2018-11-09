@@ -1,33 +1,37 @@
 import cv2
 import numpy as np
 import datetime
+import glob
 
-age_yDims = np.array([360, 410, 460])
-gdr_yDims = np.array([560])
+age_yDims = np.array([382, 432, 482])
+gdr_yDims = np.array([578])
 # q3_yDims = np.array([780, 820, 870])
-hom_yDims = np.array([790])
-x_dims = np.array([200, 420, 600])
+hom_yDims = np.array([815])
+x_dims = np.array([210, 430, 610])
 
 f_x_dims = np.array([50, 305])
 f_y_dims = np.array([530, 590, 650])
 
-black =  [0, 20, 'white']
-white = [180, 255, 'black']
-# 131, 55, 64
+black =  [0, 120]
+white = [190, 255]
 
-white_hsv = [(0,0,180),(180, 15, 255), 'white_hsv']
+white_hsv = [(0,0,180),(180, 15, 255)]
+black_hsv = [(0,0,0),(180, 255, 100)]
 green_h = 131 / 360 * 180
 green_s = 55 / 100 * 255
 green_v = 64 / 100 * 255
-green = [(green_h-20,green_s-20,green_v-20), (green_h+20, green_s+20, green_v+20), 'green']
+green = [(green_h-20,green_s-20,green_v-20), (green_h+20, green_s+20, green_v+20)]
 
 blue_h = 220 / 360 * 180
 blue_s = 96 / 100 * 255
 blue_v = 44 / 100 * 255
-blue = [(blue_h-20, blue_s-20,blue_v-20), (blue_h+20, blue_s+20, blue_v+20), 'blue']
+blue = [(blue_h-20, blue_s-20,blue_v-20), (blue_h+20, blue_s+20, blue_v+20)]
 
-interval = 35
-thresh = 7500
+INTERVAL = 20
+IMG_PATH = ''
+PIXEL_THRESHOLD = 12500
+FRONT_BLUR = 3
+BACK_BLUR = 1
 
 def age_get(dst):
     """
@@ -38,8 +42,8 @@ def age_get(dst):
     j_max = -1
     for i, x in enumerate(x_dims):
         for j, y in enumerate(age_yDims):
-            crop = dst[y:y+interval, x:x+interval]
-            if (np.sum(crop) > thresh) and (np.sum(crop) > max_test):
+            crop = dst[y:y+INTERVAL, x:x+INTERVAL]
+            if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
                 max_test = np.sum(crop)
                 i_max = i
                 j_max = j
@@ -70,9 +74,9 @@ def gdr_get(dst):
     j_max = -1
     for i, x in enumerate(x_dims):
         for j, y in enumerate(gdr_yDims):
-            crop = dst[y:y+interval, x:x+interval]
+            crop = dst[y:y+INTERVAL, x:x+INTERVAL]
             if (j < 1):
-                if (np.sum(crop) > thresh) and (np.sum(crop) > max_test):
+                if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
                     max_test = np.sum(crop)
                     i_max = i
                     j_max = j
@@ -96,9 +100,9 @@ def hom_get(dst):
     j_max = -1
     for i, x in enumerate(x_dims):
         for j, y in enumerate(hom_yDims):
-            crop = dst[y:y+interval, x:x+interval]
+            crop = dst[y:y+INTERVAL, x:x+INTERVAL]
             if (j < 1):
-                if (np.sum(crop) > thresh) and (np.sum(crop) > max_test):
+                if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
                     max_test = np.sum(crop)
                     i_max = i
                     j_max = j
@@ -121,9 +125,9 @@ def q1_get(dst):
     j_max = -1
     for i, x in enumerate(f_x_dims):
         for j, y in enumerate(f_y_dims):
-            crop = dst[y:y+interval, x:x+interval]
+            crop = dst[y:y+INTERVAL, x:x+INTERVAL]
             if (j < 2) or ((j == 2) and (i==0)):
-                if (np.sum(crop) > thresh) and (np.sum(crop) > max_test):
+                if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
                     max_test = np.sum(crop)
                     i_max = i
                     j_max = j
@@ -150,9 +154,9 @@ def q2_get(dst):
     j_max = -1
     for i, x in enumerate(f_x_dims):
         for j, y in enumerate(f_y_dims):
-            crop = dst[y:y+interval, x:x+interval]
+            crop = dst[y:y+INTERVAL, x:x+INTERVAL]
             if (j < 2) or ((j == 2) and (i==0)):
-                if (np.sum(crop) > thresh) and (np.sum(crop) > max_test):
+                if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
                     max_test = np.sum(crop)
                     i_max = i
                     j_max = j
@@ -184,10 +188,11 @@ def image_process(path, b, side):
     """
     img = cv2.imread(path)
     if (side == 'b'):
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         blur = cv2.blur(gray,(b, b))
-        # mask_black = cv2.inRange(blur, black[0], black[1])
-        mask = cv2.inRange(blur, white[0], white[1])
+        mask_white = cv2.inRange(blur, white_hsv[0], white_hsv[1])
+        mask_black = cv2.inRange(blur, black_hsv[0], black_hsv[1])
+        mask = cv2.bitwise_or(mask_white, mask_black)
         # mask_inv = cv2.bitwise_or(mask_black, mask_white)
     elif (side == 'f'):
         col = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -201,30 +206,22 @@ def image_process(path, b, side):
     # cv2.imwrite('test.png', mask)
     return cv2.bitwise_and(blur, blur, mask=mask)
 
-def read_back(path):
+def read_cards():
     """
-    Read card back.
+    Read card
     """
-    card = image_process(path, 5, 'b')
-    # cv2.imwrite('test.png', card)
-    return [age_get(card), gdr_get(card), hom_get(card)]
-
-def read_front(path):
-    """
-    Read card back
-    """
-    card = image_process(path, 5, 'f')
-    cv2.imwrite('test-10.png', card)
-    return [q1_get(card)]
-
-for i in range(17):
-    path = 'assets/focus_group/q'
-    q = 1
-    front = path + str(q) + '/' + str(i) + '-front.png'
-    back = path + str(q) + '/' + str(i) + '-back.png'
-    print(i, read_front(front), read_back(back))
-
-# read_front('assets/focus_group/q1/5-front.png')
-# image_process('assets/focus_group/q1/0-front.png', 2, 'f')
-read_back('assets/focus_group/q2/9-back.png')
-read_front('assets/focus_group/q1/10-front.png')
+    path = 'assets/focus_group/q1/orb/'
+    cards = glob.glob1(path,'*.png')
+    # print(cards)
+    for i, card in enumerate(sorted(cards)):
+        if 'back' in card:
+            front_card = card.replace('back', 'front')
+            # Process card sides.
+            back_proc = image_process(path + card, BACK_BLUR, 'b')
+            front_proc = image_process(path + front_card, FRONT_BLUR, 'f')
+            num = card.split('-')[0]
+            age = age_get(back_proc)
+            gdr = gdr_get(back_proc)
+            home = hom_get(back_proc)
+            resp = q1_get(front_proc)
+            print([num, resp, age, gdr, home, card, front_card])

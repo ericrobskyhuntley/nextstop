@@ -10,4 +10,4 @@ class ResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Response
-        fields = ('id', 'q_text', 'a_text', 'timestamp', 'scan', 's_text')
+        fields = ('id', 'q_text', 'a_text', 'timestamp', 'front', 'back' 's_text')
