@@ -7,3 +7,5 @@
 **/_deprecated
 **/__pycache__
 futuremobility/static/*
+**/assets/*
+**/*.png
