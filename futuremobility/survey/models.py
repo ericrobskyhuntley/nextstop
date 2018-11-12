@@ -1,5 +1,8 @@
 from django.db import models
 import uuid
+import os
+from django.conf import settings
+
 
 class Survey(models.Model):
     """
@@ -22,21 +25,23 @@ class Response(models.Model):
         help_text='Unique ID for this response.')
     q = models.ForeignKey('Question', on_delete=models.SET_NULL, null=True,
         help_text='Survey question.')
-    a = models.ForeignKey('Answer', on_delete=models.SET_NULL, null=True,
+    a = models.ManyToManyField('Answer',
         help_text='Survey response.')
 
+    NULL = 'n'
     M = 'male'
     F = 'female'
     N = 'nonbinary'
 
     GENDERS = (
+        (NULL, 'Not specified'),
         (M, 'Male'),
         (F, 'Female'),
         (N, 'Nonbinary'),
     )
 
-    gender = models.CharField(max_length=200, choices=GENDERS,
-        default=N, help_text='Gender identity.')
+    gender = models.CharField(max_length=200, null=True, choices=GENDERS,
+        default=None, help_text='Gender identity.')
 
     A = 'under-18'
     B = '18-24'
@@ -47,38 +52,41 @@ class Response(models.Model):
     G = '65-plus'
 
     AGES = (
+        (NULL, 'Not specified'),
         (A, 'Under 18.'),
         (B, '18-24'),
-        (C, '25-34'),
-        (D, '35-44'),
+        (C, '25-35'),
+        (D, '36-44'),
         (E, '45-54'),
         (F, '55-64'),
         (G, '65+.')
     )
 
-    age = models.CharField(max_length=25, choices=AGES, default=C, help_text='Age classes.')
+    age = models.CharField(max_length=25, null=True, choices=AGES, default=None, help_text='Age classes.')
 
     U = 'urban'
     S = 'suburban'
     R = 'rural'
 
     HOMES = (
+        (NULL, 'Not specified'),
         (U, 'Urban'),
         (S, 'Suburban'),
         (R, 'Rural'),
     )
 
-    zip_code = models.CharField(max_length=10, null=True, help_text='ZIP code.')
-    home = models.CharField(max_length=10, choices=HOMES, default=U,
+    zip_code = models.CharField(max_length=10, null=True, blank=True, default=None, help_text='ZIP code.')
+    home = models.CharField(max_length=10, null=True, choices=HOMES, default=None,
         help_text='Type of location respondant calls home.')
+    free_q = models.ForeignKey('FreeQuestion', on_delete=models.SET_NULL,
+        null=True, help_text='Free response question.')
+    free_resp = models.CharField(max_length=200, null=True, blank=True,  help_text='Text of free response.')
     survey = models.ForeignKey('Survey', on_delete=models.SET_NULL, null=True,
         help_text='Survey name.')
     timestamp = models.DateTimeField(auto_now_add=True,
         help_text='Timestamp of scan.')
-    front = models.CharField(max_length=200, null=True,
-        help_text='Path to full card scan.')
-    back = models.CharField(max_length=200, null=True,
-        help_text='Path to full card scan.')
+    front = models.FilePathField(path=os.path.join(settings.STATIC_ROOT, 'cards/fg1/'), match='.*-front\.png$', recursive=True, null=True, help_text='Path to card front scan.')
+    back = models.FilePathField(path=os.path.join(settings.STATIC_ROOT, 'cards/fg1/'), match='.*-back\.png$', recursive=True, null=True, help_text='Path to card back scan.')
 
     def __str__(self):
         """String for representing the Question Model object."""
@@ -102,7 +110,7 @@ class Question(models.Model):
 
     question = models.CharField(max_length=200,
         help_text='Question text.')
-    type = models.CharField(max_length=200, choices=QUESTION_TYPES, default=MULT, help_text='Question type.')
+    question_type = models.CharField(max_length=200, choices=QUESTION_TYPES, default=MULT, help_text='Question type.')
 
     def __str__(self):
         """String for representing the Question Model object."""
@@ -112,12 +120,21 @@ class Question(models.Model):
         """Returns the url to access a detail record for this question."""
         return reverse('question-detail', args=[str(self.id)])
 
+class FreeQuestion(models.Model):
+    """
+    Model representing a question.
+    """
+    free_question = models.CharField(max_length=200, help_text='Free response question text.')
+
+    def __str__(self):
+        """String for representing the Question Model object."""
+        return self.free_question
+
 class Answer(models.Model):
     """
     Model representing an answer.
     """
-    q = models.ForeignKey(Question, on_delete=models.SET_NULL, null=True,
-        help_text='Associated question.')
+    q = models.ManyToManyField(Question, help_text='Associated question.')
     answer = models.CharField(max_length=200,
         help_text='Answer.')
 

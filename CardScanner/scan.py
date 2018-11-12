@@ -84,27 +84,27 @@ def align_images_ecc(im, ref):
     return im_align
 
 
-front_ref = cv2.imread('assets/focus_group/templates/q1_f2_front.jpg')
-back_ref = cv2.imread('assets/focus_group/templates/back.jpg')
-
-import glob
-path = 'assets/focus_group/q1/f2/'
-card_backs = glob.glob1(path,'*back.png')
-card_fronts = glob.glob1(path,'*front.png')
-card_backs
-for card in card_backs:
-    path = 'assets/focus_group/q1/f2/'
-    back_img = cv2.imread(path + card)
-    back_align = align_images_orb(back_img, back_ref)
-    path = 'assets/focus_group/q1/orb/'
-    cv2.imwrite(path + card, back_align)
-
-for card in card_fronts:
-    path = 'assets/focus_group/q1/f2/'
-    front_img = cv2.imread(path + card)
-    front_align = align_images_orb(front_img, front_ref)
-    path = 'assets/focus_group/q1/orb/'
-    cv2.imwrite(path + card, front_align)
+# front_ref = cv2.imread('assets/focus_group/templates/q2_f2_front.jpg')
+# back_ref = cv2.imread('assets/focus_group/templates/back.jpg')
+#
+# import glob
+# path = 'assets/focus_group/q2/f2/'
+# card_backs = glob.glob1(path,'*back.png')
+# card_fronts = glob.glob1(path,'*front.png')
+# card_backs
+# for card in card_backs:
+#     path = 'assets/focus_group/q2/f2/'
+#     back_img = cv2.imread(path + card)
+#     back_align = align_images_orb(back_img, back_ref)
+#     path = 'assets/focus_group/q2/orb/'
+#     cv2.imwrite(path + card, back_align)
+#
+# for card in card_fronts:
+#     path = 'assets/focus_group/q2/f2/'
+#     front_img = cv2.imread(path + card)
+#     front_align = align_images_orb(front_img, front_ref)
+#     path = 'assets/focus_group/q2/orb/'
+#     cv2.imwrite(path + card, front_align)
 
 def bg_trim(im):
     """
