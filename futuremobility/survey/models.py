@@ -8,10 +8,16 @@ class Survey(models.Model):
     """
     Model representing a survey.
     """
-    name = models.CharField(max_length=200, null=True,
-        help_text='Name of survey.')
-    desc = models.CharField(max_length=200, null=True,
-        help_text='Description of survey.')
+    name = models.CharField(
+        max_length=50,
+        null=True,
+        help_text='Name of survey.'
+    )
+    desc = models.CharField(
+        max_length=250,
+        null=True,
+        help_text='Description of survey.'
+    )
 
     def __str__(self):
         """String for representing the Survey object."""
@@ -21,12 +27,21 @@ class Response(models.Model):
     """
     Model representing a exhibit reseponse.
     """
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4,
-        help_text='Unique ID for this response.')
-    q = models.ForeignKey('Question', on_delete=models.SET_NULL, null=True,
-        help_text='Survey question.')
-    a = models.ManyToManyField('Answer',
-        help_text='Survey response.')
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        help_text='Unique ID for this response.'
+    )
+    q = models.ForeignKey(
+        'Question',
+        on_delete=models.SET_NULL,
+        null=True,
+        help_text='Survey question.'
+    )
+    a = models.ManyToManyField(
+        'Answer',
+        help_text='Survey response.'
+    )
 
     NULL = 'n'
     M = 'male'
@@ -40,8 +55,12 @@ class Response(models.Model):
         (N, 'Nonbinary'),
     )
 
-    gender = models.CharField(max_length=200, null=True, choices=GENDERS,
-        default=None, help_text='Gender identity.')
+    gender = models.CharField(
+        max_length=25,
+        null=True,
+        choices=GENDERS,
+        default=None,
+        help_text='Gender identity.')
 
     A = 'under-18'
     B = '18-24'
@@ -62,7 +81,19 @@ class Response(models.Model):
         (G, '65+.')
     )
 
-    age = models.CharField(max_length=25, null=True, choices=AGES, default=None, help_text='Age classes.')
+    age = models.CharField(max_length=25,
+        null=True,
+        choices=AGES,
+        default=None,
+        help_text='Age classes.')
+
+    zip_code = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True,
+        default=None,
+        help_text='ZIP code.'
+    )
 
     U = 'urban'
     S = 'suburban'
@@ -75,18 +106,48 @@ class Response(models.Model):
         (R, 'Rural'),
     )
 
-    zip_code = models.CharField(max_length=10, null=True, blank=True, default=None, help_text='ZIP code.')
-    home = models.CharField(max_length=10, null=True, choices=HOMES, default=None,
-        help_text='Type of location respondant calls home.')
-    free_q = models.ForeignKey('FreeQuestion', on_delete=models.SET_NULL,
-        null=True, help_text='Free response question.')
-    free_resp = models.CharField(max_length=200, null=True, blank=True,  help_text='Text of free response.')
-    survey = models.ForeignKey('Survey', on_delete=models.SET_NULL, null=True,
-        help_text='Survey name.')
-    timestamp = models.DateTimeField(auto_now_add=True,
-        help_text='Timestamp of scan.')
-    front = models.FilePathField(path=os.path.join(settings.STATIC_ROOT, 'cards/fg1/'), match='.*-front\.png$', recursive=True, null=True, help_text='Path to card front scan.')
-    back = models.FilePathField(path=os.path.join(settings.STATIC_ROOT, 'cards/fg1/'), match='.*-back\.png$', recursive=True, null=True, help_text='Path to card back scan.')
+    home = models.CharField(
+        max_length=10,
+        null=True,
+        choices=HOMES,
+        default=None,
+        help_text='Type of location respondant calls home.'
+    )
+    free_q = models.ForeignKey(
+        'FreeQuestion',
+        on_delete=models.SET_NULL,
+        null=True,
+        help_text='Free response question.'
+    )
+    free_resp = models.CharField(
+        max_length=200,
+        null=True,
+        blank=True,
+        help_text='Text of free response.'
+    )
+    survey = models.ForeignKey(
+        'Survey',
+        on_delete=models.SET_NULL,
+        null=True,
+        help_text='Survey name.'
+    )
+    timestamp = models.DateTimeField(
+        auto_now_add=True,
+        help_text='Timestamp of scan.'
+    )
+    front = models.FilePathField(
+        path=os.path.join(settings.STATIC_ROOT, 'cards/fg1/'),
+        match='.*-front\.png$',
+        recursive=True,
+        null=True,
+        help_text='Path to card front scan.')
+    back = models.FilePathField(
+        path=os.path.join(settings.STATIC_ROOT, 'cards/fg1/'),
+        match='.*-back\.png$',
+        recursive=True,
+        null=True,
+        help_text='Path to card back scan.'
+    )
 
     def __str__(self):
         """String for representing the Question Model object."""
@@ -108,9 +169,16 @@ class Question(models.Model):
         (LIKERT, 'Likert'),
     )
 
-    question = models.CharField(max_length=200,
-        help_text='Question text.')
-    question_type = models.CharField(max_length=200, choices=QUESTION_TYPES, default=MULT, help_text='Question type.')
+    question = models.CharField(
+        max_length=200,
+        help_text='Question text.'
+    )
+    question_type = models.CharField(
+        max_length=200,
+        choices=QUESTION_TYPES,
+        default=MULT,
+        help_text='Question type.'
+    )
 
     def __str__(self):
         """String for representing the Question Model object."""
@@ -124,7 +192,10 @@ class FreeQuestion(models.Model):
     """
     Model representing a question.
     """
-    free_question = models.CharField(max_length=200, help_text='Free response question text.')
+    free_question = models.CharField(
+        max_length=200,
+        help_text='Free response question text.'
+    )
 
     def __str__(self):
         """String for representing the Question Model object."""
@@ -134,9 +205,14 @@ class Answer(models.Model):
     """
     Model representing an answer.
     """
-    q = models.ManyToManyField(Question, help_text='Associated question.')
-    answer = models.CharField(max_length=200,
-        help_text='Answer.')
+    q = models.ManyToManyField(
+        Question,
+        help_text='Associated question.'
+    )
+    answer = models.CharField(
+        max_length=200,
+        help_text='Answer.'
+    )
 
     def __str__(self):
         """String for representing the Question Model object."""
