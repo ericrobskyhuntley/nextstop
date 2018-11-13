@@ -23,7 +23,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'cg#p$g+j9tax!#a3cup@1$8obt2_+&
 
 DEBUG = bool(os.environ.get('DJANGO_DEBUG', True))
 
-ALLOWED_HOSTS = ['ehuntley.media.mit.edu', '18.85.45.120', 'localhost']
+ALLOWED_HOSTS = ['.mit.edu', '18.85.45.120', 'localhost']
 
 
 # Application definition

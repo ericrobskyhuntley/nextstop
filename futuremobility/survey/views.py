@@ -1,9 +1,9 @@
 from django.shortcuts import render
-from rest_framework import generics
+from rest_framework import viewsets
 from .serializers import ResponseSerializer
-from .models import Response
+from .models import Response, Question
 
-class ListResponseView(generics.ListAPIView):
+class ResponseViewSet(viewsets.ModelViewSet):
     """
     GET method handler
     """
