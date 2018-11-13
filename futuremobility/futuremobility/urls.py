@@ -23,7 +23,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('survey/', include('survey.urls')),
-    path('', RedirectView.as_view(url='/survey/')),
+    path('', RedirectView.as_view(url='/admin/')),
     re_path('api/(?P<version>(v1|v2))/', include('survey.urls')),
 ]
 

@@ -43,21 +43,22 @@ class Response(models.Model):
         help_text='Survey response.'
     )
 
-    NULL = 'n'
-    M = 'male'
-    F = 'female'
+    NULL = ''
     N = 'nonbinary'
+    F = 'female'
+    M = 'male'
 
     GENDERS = (
-        (NULL, 'Not specified'),
-        (M, 'Male'),
-        (F, 'Female'),
+        (NULL, ''),
         (N, 'Nonbinary'),
+        (F, 'Female'),
+        (M, 'Male'),
     )
 
     gender = models.CharField(
-        max_length=25,
+        max_length=20,
         null=True,
+        blank=True,
         choices=GENDERS,
         default=None,
         help_text='Gender identity.')
@@ -71,7 +72,7 @@ class Response(models.Model):
     G = '65-plus'
 
     AGES = (
-        (NULL, 'Not specified'),
+        (NULL, ''),
         (A, 'Under 18.'),
         (B, '18-24'),
         (C, '25-35'),
@@ -81,7 +82,8 @@ class Response(models.Model):
         (G, '65+.')
     )
 
-    age = models.CharField(max_length=25,
+    age = models.CharField(max_length=20,
+        blank=True,
         null=True,
         choices=AGES,
         default=None,
@@ -100,7 +102,7 @@ class Response(models.Model):
     R = 'rural'
 
     HOMES = (
-        (NULL, 'Not specified'),
+        (NULL, ''),
         (U, 'Urban'),
         (S, 'Suburban'),
         (R, 'Rural'),
@@ -109,6 +111,7 @@ class Response(models.Model):
     home = models.CharField(
         max_length=10,
         null=True,
+        blank=True,
         choices=HOMES,
         default=None,
         help_text='Type of location respondant calls home.'
