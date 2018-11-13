@@ -24,6 +24,7 @@ from survey import views
 
 router = routers.DefaultRouter()
 router.register(r'responses', views.ResponseViewSet)
+router.register(r'randomcard', views.RandomCardViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -9,3 +9,10 @@ class ResponseViewSet(viewsets.ModelViewSet):
     """
     queryset = Response.objects.all()
     serializer_class = ResponseSerializer
+
+class RandomCardViewSet(viewsets.ModelViewSet):
+    """
+    GET method handler
+    """
+    queryset = Response.objects.order_by('?')[:1]
+    serializer_class = ResponseSerializer
