@@ -170,6 +170,5 @@ try:
             # cr.read_back(image)
             image.save(f'assets/focus_group/q1/lgt_pap/{floor((i-1)/2)}-front.png')
 
-
 finally:
     pyinsane2.exit()
