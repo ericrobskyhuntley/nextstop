@@ -18,21 +18,3 @@ class ResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Response
         fields = ('id', 'q_text', 'a', 'gender', 'age', 'zip_code', 'home', 'free_q_text', 'free_resp', 's_text', 'timestamp', 'front', 'back', )
-
-
-# class ResponseSerializer(serializers.ModelSerializer):
-#     a = ResponseSerializer(many=True, read_only=True)
-#     class Meta:
-#         model = Response
-#         fields = ('a',
-
-# class ResponseSerializer(serializers.ModelSerializer):
-#
-#     # q_text = serializers.CharField(source='q.question')
-#     # a_text = serializers.CharField(source='a.answer')
-#     # s_text = serializers.CharField(source='survey.name')
-#
-#
-#     class Meta:
-#         model = Response
-#         fields = ('id', 'q', 'a', 'gender', 'age', 'zip_code', 'home', 'free_q', 'free_resp', 'survey', 'timestamp', 'front', 'back')

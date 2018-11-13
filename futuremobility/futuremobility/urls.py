@@ -32,7 +32,8 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/admin/')),
     # re_path('api/(?P<version>(v1|v2))/', include('survey.urls')),
     url(r'^', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^qcount/$', views.QCountView.as_view()),
+    # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
