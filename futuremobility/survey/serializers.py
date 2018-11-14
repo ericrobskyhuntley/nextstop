@@ -25,4 +25,4 @@ class QCountSerializer(serializers.Serializer):
     total = serializers.IntegerField()
 
     def get_question(self, obj):
-        return Question.objects.filter(id=4).values_list('question', flat=True)[0]
+        return Question.objects.filter(id=obj['q']).values_list('question', flat=True)[0]
