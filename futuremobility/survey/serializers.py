@@ -17,4 +17,12 @@ class ResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Response
-        fields = ('id', 'q_text', 'a', 'gender', 'age', 'zip_code', 'home', 'free_q_text', 'free_resp', 's_text', 'timestamp', 'front', 'back', )
+        fields = ('id', 'q_text', 'a', 'gender', 'aizersge', 'zip_code', 'home', 'free_q_text', 'free_resp', 's_text', 'timestamp', 'front', 'back', )
+
+class QCountSerializer(serializers.Serializer):
+
+    question = serializers.SerializerMethodField()
+    total = serializers.IntegerField()
+
+    def get_question(self, obj):
+        return Question.objects.filter(id=4).values_list('question', flat=True)[0]

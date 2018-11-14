@@ -25,6 +25,7 @@ from survey import views
 router = routers.DefaultRouter()
 router.register(r'responses', views.ResponseViewSet)
 router.register(r'randomcard', views.RandomCardViewSet)
+router.register(r'qcount', views.QCountViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,7 +33,7 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/admin/')),
     # re_path('api/(?P<version>(v1|v2))/', include('survey.urls')),
     url(r'^', include(router.urls)),
-    url(r'^qcount/$', views.QCountView.as_view()),
+    # url(r'^qcount/$', views.QCountView.as_view()),
     # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
 

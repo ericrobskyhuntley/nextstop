@@ -139,13 +139,13 @@ class Response(models.Model):
         help_text='Timestamp of scan.'
     )
     front = models.FilePathField(
-        path=os.path.join(settings.STATIC_URL, 'cards/'),
+        path=os.path.join(settings.STATIC_URL, 'cards/fg2/'),
         match='.*-front\.png$',
         recursive=True,
         null=True,
         help_text='Path to card front scan.')
     back = models.FilePathField(
-        path=os.path.join(settings.STATIC_URL, 'cards/'),
+        path=os.path.join(settings.STATIC_URL, 'cards/fg2/'),
         match='.*-back\.png$',
         recursive=True,
         null=True,
