@@ -9,17 +9,14 @@ from survey import views
 
 router = routers.DefaultRouter()
 router.register(r'responses', views.ResponseViewSet)
+# manually specifying basename is necessary because of the RandomCardViewSet class' custom get_queryset
 router.register(r'random', views.RandomCardViewSet, basename='random-list')
 router.register(r'qcount', views.QCountViewSet)
-# router.register(r'random/(?P<q>)/$', views.RandomCardViewSet, basename='random-list')
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='/admin/')),
     url(r'^', include(router.urls)),
-    # url('^random/(?P<q>.+)/$', views.RandomCardViewSet),
-    #  namespace='rest_framework')),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
