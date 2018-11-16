@@ -1,6 +1,7 @@
 import pyinsane2
 import logging
 from math import floor
+import cv2
 
 def setup():
     pyinsane2.init()
@@ -26,21 +27,33 @@ def setup():
     print(f'PyInsane2 initiatied using {device.name}.')
     return device
 
-def doc_load(device):
+# def doc_load(device):
+#     try:
+#         scan_session = device.scan(multiple=True)
+#         print("Scanning ...")
+#         while True:
+#             try:
+#                 scan_session.scan.read()
+#             except EOFError:
+#                 print("Got page %d" % (len(scan_session.images)))
+#                 for i in range(0, len(scan_session.images)):
+#                     image = scan_session.images[i]
+#                     if (i % 2 == 0) | (i == 0):
+#                         # back = read_back(cv2.imread(image))
+#                         # image.save(f'{floor(i/2)}-back.png')
+#                     else:
+#                         # front = read_front(cv2.imread(image))
+#                         # cr.read_back(image)
+#                         # image.save(f'{floor((i-1)/2)}-front.png')
+#     except StopIteration:
+#         print("C'mon!")
+#         pyinsane2.exit()
+
+
+def scan_test(device):
     try:
         scan_session = device.scan(multiple=True)
-        print("Scanning ...")
-        while True:
-            try:
-                scan_session.scan.read()
-            except EOFError:
-                print("Got page %d" % (len(scan_session.images)))
-                for i in range(0, len(scan_session.images)):
-                    image = scan_session.images[i]
-                    if (i % 2 == 0) | (i == 0):
-                        image.save(f'{floor(i/2)}-back.png')
-                    else:
-                        # cr.read_back(image)
-                        image.save(f'{floor((i-1)/2)}-front.png')
+        print("Scanning...")
     except StopIteration:
-        print("C'mon!")
+        print('start over!')
+        pyinsane2.exit()

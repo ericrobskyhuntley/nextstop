@@ -206,11 +206,25 @@ def image_process(path, b, side):
     # cv2.imwrite('test.png', mask)
     return cv2.bitwise_and(blur, blur, mask=mask)
 
-def read_cards():
+
+def read_front(img):
+    front_proc = image_process(img, FRONT_BLUR, 'f')
+    # num = card.split('-')[0]
+    resp = q1_get(front_proc)
+    return [resp]
+
+def read_back(img):
+    back_proc = image_process(img, BACK_BLUR, 'b')
+    # num = card.split('-')[0]
+    age = age_get(back_proc)
+    gdr = gdr_get(back_proc)
+    home = hom_get(back_proc)
+    return [age, gdr, home]
+
+def read_cards(path):
     """
     Read card
     """
-    path = 'assets/focus_group/q1/orb/'
     cards = glob.glob1(path,'*.png')
     # print(cards)
     for i, card in enumerate(sorted(cards)):
@@ -219,9 +233,9 @@ def read_cards():
             # Process card sides.
             back_proc = image_process(path + card, BACK_BLUR, 'b')
             front_proc = image_process(path + front_card, FRONT_BLUR, 'f')
-            num = card.split('-')[0]
+            # num = card.split('-')[0]
             age = age_get(back_proc)
             gdr = gdr_get(back_proc)
             home = hom_get(back_proc)
             resp = q1_get(front_proc)
-            print([num, resp, age, gdr, home, card, front_card])
+            print([resp, age, gdr, home])

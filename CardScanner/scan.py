@@ -4,6 +4,7 @@ from PIL import Image, ImageChops
 from math import floor
 import numpy as np
 import cv2
+import datetime
 
 MAX_FEATURES = 800
 GOOD_MATCH_PERCENT = 0.15
@@ -83,29 +84,6 @@ def align_images_ecc(im, ref):
         im_align = cv2.warpAffine(im, warp_matrix, (sz[1],sz[0]), flags=cv2.INTER_LINEAR + cv2.WARP_INVERSE_MAP)
     return im_align
 
-
-# front_ref = cv2.imread('assets/focus_group/templates/q2_f2_front.jpg')
-# back_ref = cv2.imread('assets/focus_group/templates/back.jpg')
-#
-# import glob
-# path = 'assets/focus_group/q2/f2/'
-# card_backs = glob.glob1(path,'*back.png')
-# card_fronts = glob.glob1(path,'*front.png')
-# card_backs
-# for card in card_backs:
-#     path = 'assets/focus_group/q2/f2/'
-#     back_img = cv2.imread(path + card)
-#     back_align = align_images_orb(back_img, back_ref)
-#     path = 'assets/focus_group/q2/orb/'
-#     cv2.imwrite(path + card, back_align)
-#
-# for card in card_fronts:
-#     path = 'assets/focus_group/q2/f2/'
-#     front_img = cv2.imread(path + card)
-#     front_align = align_images_orb(front_img, front_ref)
-#     path = 'assets/focus_group/q2/orb/'
-#     cv2.imwrite(path + card, front_align)
-
 def bg_trim(im):
     """
     Function to programmatically crop card to edge.
@@ -163,12 +141,12 @@ try:
         print(f'Document feeder is empty. Scanned {len(scan_session.images)} pages.')
     for i in range(0, len(scan_session.images)):
         image = bg_trim(scan_session.images[i])
-        image = align_images()
+        ts = datetime.datetime.now().timestamp()
+        # image = align_images()
         if (i % 2 == 0) | (i == 0):
-            image.save(f'assets/focus_group/q1/lgt_pap/{floor(i/2)}-back.png')
+            image.save(f'assets/focus_group_2/{floor(i/2)}-back.png')
         else:
-            # cr.read_back(image)
-            image.save(f'assets/focus_group/q1/lgt_pap/{floor((i-1)/2)}-front.png')
+            image.save(f'assets/focus_group_2/{floor((i-1)/2)}-front.png')
 
 finally:
     pyinsane2.exit()

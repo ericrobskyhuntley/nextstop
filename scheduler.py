@@ -1,12 +1,14 @@
 from CardScanner import scanner
+from CardReader import cr
 import schedule
 import time
+from os import listdir
 
-dev = scanner.setup()
-def job(d):
-    scanner.doc_load(d)
+def scan():
+    dev = scanner.setup()
+    scanner.scan_test(dev)
 
-schedule.every(1).seconds.do(job, dev)
+schedule.every(1).seconds.do(scan)
 
 while True:
     schedule.run_pending()
