@@ -1,10 +1,8 @@
 from django.shortcuts import render
 from rest_framework import  viewsets
-from .serializers import ResponseSerializer, QCountSerializer
-from .models import Response, Question
-# from rest_framework.decorators import list_route
-from rest_framework.decorators import action
 from django.db.models import Count
+from .models import Response
+from .serializers import ResponseSerializer, QCountSerializer
 
 class ResponseViewSet(viewsets.ReadOnlyModelViewSet):
     """
