@@ -5,7 +5,7 @@ from .models import Response, Question, Answer
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
-        fields = ('answer',)
+        fields = ('id', 'answer',)
 
 class ResponseSerializer(serializers.ModelSerializer):
 
@@ -17,12 +17,13 @@ class ResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Response
-        fields = ('id', 'q_text', 'a', 'gender', 'aizersge', 'zip_code', 'home', 'free_q_text', 'free_resp', 's_text', 'timestamp', 'front', 'back', )
+        fields = ('id', 'q', 'q_text', 'a', 'gender', 'age', 'zip_code', 'home', 'free_q_text', 'free_resp', 'survey', 's_text', 'timestamp', 'front', 'back', )
 
 class QCountSerializer(serializers.Serializer):
 
-    question = serializers.SerializerMethodField()
+    q = serializers.IntegerField()
+    q_text  = serializers.SerializerMethodField()
     total = serializers.IntegerField()
 
-    def get_question(self, obj):
+    def get_q_text(self, obj):
         return Question.objects.filter(id=obj['q']).values_list('question', flat=True)[0]
