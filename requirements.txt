@@ -10,4 +10,5 @@ psycopg2==2.7.6
 pyinsane2==2.0.13
 pyocr==0.5.3
 pytz==2018.7
+schedule==0.5.0
 six==1.11.0

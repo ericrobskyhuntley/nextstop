@@ -1,7 +1,7 @@
 import pyinsane2
-import logging
-from math import floor
-import cv2
+# import logging
+# from math import floor
+# import cv2
 
 pyinsane2.init()
 devices = pyinsane2.get_devices()
