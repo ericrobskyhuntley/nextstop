@@ -1,37 +1,50 @@
 import factory
 import factory.django
 import factory.fuzzy
-from survey.models import Question, Answer, Survey, Response
+import random
+from survey.models import Question, Answer, Survey, Response, FreeQuestion
 
 class QuestionFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Question
-        django_get_or_create = ['question', 'type']
+        django_get_or_create = ['id',]
 
-    question = 'Right now, I’m feeling _______ about widespread autonomous vehicle use.'
-    type = 'multiple-choice'
-
-class AnswerFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = Answer
-        django_get_or_create = ['q', 'answer']
-
-    q = factory.SubFactory(QuestionFactory)
-    answer = factory.fuzzy.FuzzyChoice(['Eager', 'Optimistic', 'Neutral', 'Anxious', 'Afraid'])
+    id = 5
 
 class SurveyFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Survey
-        django_get_or_create = ['name', 'desc']
+        django_get_or_create = ['id',]
 
-    name = 'Pre-populate'
-    desc = 'Pre-populating database for visualization test purposes.'
+    id = 2
+
+class FreeQuestionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = FreeQuestion
+        django_get_or_create = ['id',]
+
+    id = 2
+
 
 class ResponseFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Response
 
     q = factory.SubFactory(QuestionFactory)
-    a = factory.SubFactory(AnswerFactory)
+    @factory.post_generation
+    def a(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+        if extracted:
+            # A list of groups were passed in, use them
+            for answer in extracted:
+                self.a.add(answer)
+    gender = factory.fuzzy.FuzzyChoice(['nonbinary', 'female', 'male'])
+    age = factory.fuzzy.FuzzyChoice(['under-18', '18-24', '25-34', '35-44', '45-54', '55-64', '65-plus'])
+    zip_code = factory.Faker('zipcode')
+    free_q = factory.SubFactory(FreeQuestionFactory)
+    free_resp = ''
     survey = factory.SubFactory(SurveyFactory)
-    scan = '~/test/test-001.png'
+    front = 'static/templates/q04-front.png'
+    back = 'static/templates/q04-back.png'

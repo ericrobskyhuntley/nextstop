@@ -3,7 +3,7 @@ from django.contrib import admin
 from survey.models import Survey, Response, Question, FreeQuestion, Answer
 
 class SurveyAdmin(admin.ModelAdmin):
-    list_display = ('name', 'desc')
+    list_display = ('id', 'name', 'desc')
 admin.site.register(Survey, SurveyAdmin)
 
 class ResponseAdmin(admin.ModelAdmin):
@@ -16,11 +16,9 @@ class QuestionAdmin(admin.ModelAdmin):
     list_display = ('id', 'question', 'question_type')
 admin.site.register(Question, QuestionAdmin)
 
-admin.site.register(FreeQuestion)
-
-# class FreeQuestionAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'free_question')
-# admin.site.register(FreeQuestion, FreeQuestionAdmin)
+class FreeQuestionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'free_question')
+admin.site.register(FreeQuestion, FreeQuestionAdmin)
 
 class AnswerAdmin(admin.ModelAdmin):
     list_display = ('id', 'answer', 'get_questions')
