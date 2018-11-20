@@ -6,7 +6,10 @@ from os import listdir
 
 def scan():
     dev = scanner.setup()
-    scanner.scan_test(dev)
+    if dev is not None:
+        scanner.scan_test(dev)
+    else:
+        print("cannot scan")
 
 schedule.every(1).seconds.do(scan)
 

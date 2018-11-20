@@ -9,26 +9,30 @@ devices = pyinsane2.get_devices()
 def setup():
     pyinsane2.init()
     devices = pyinsane2.get_devices()
-    assert(len(devices) > 0)
-    device = devices[0]
-    # Specify color scanning
-    pyinsane2.set_scanner_opt(device, 'mode', ['24bit Color[Fast]'])
-    # Set scan resolution
-    pyinsane2.set_scanner_opt(device, 'resolution', [200])
-    pyinsane2.set_scanner_opt(device, 'MultifeedDetection', [1])
-    # set scanner dimensions
-    # pyinsane2.set_scanner_opt(device, 'tl-x', [0])
-    # pyinsane2.set_scanner_opt(device, 'tl-y', [0])
-    # pyinsane2.set_scanner_opt(device, 'br-x', [floor(215.88)])
-    # pyinsane2.set_scanner_opt(device, 'br-y', [floor((1218 / 2795) * 3556)])
-    # Set scan area
-    pyinsane2.maximize_scan_area(device)
     try:
-        pyinsane2.set_scanner_opt(device, 'source', ['Automatic Document Feeder(center aligned,Duplex)'])
-    except pyinsane2.PyinsaneException as e:
-        print('No document feeder found', e)
-    print(f'PyInsane2 initiatied using {device.name}.')
-    return device
+        assert(len(devices) > 0)
+        device = devices[0]
+        # Specify color scanning
+        pyinsane2.set_scanner_opt(device, 'mode', ['24bit Color[Fast]'])
+        # Set scan resolution
+        pyinsane2.set_scanner_opt(device, 'resolution', [200])
+        pyinsane2.set_scanner_opt(device, 'MultifeedDetection', [1])
+        # set scanner dimensions
+        # pyinsane2.set_scanner_opt(device, 'tl-x', [0])
+        # pyinsane2.set_scanner_opt(device, 'tl-y', [0])
+        # pyinsane2.set_scanner_opt(device, 'br-x', [floor(215.88)])
+        # pyinsane2.set_scanner_opt(device, 'br-y', [floor((1218 / 2795) * 3556)])
+        # Set scan area
+        pyinsane2.maximize_scan_area(device)
+        try:
+            pyinsane2.set_scanner_opt(device, 'source', ['Automatic Document Feeder(center aligned,Duplex)'])
+        except pyinsane2.PyinsaneException as e:
+            print('No document feeder found', e)
+        print(f'PyInsane2 initiatied using {device.name}.')
+        return device
+    except AssertionError:
+        print("no scanners found")
+        pyinsane2.exit()
 
 # def doc_load(device):
 #     try:
