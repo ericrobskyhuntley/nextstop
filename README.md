@@ -18,7 +18,7 @@ Backend for [@civic-data-design-lab](http://github.com/civic-data-design-lab)'s 
 
 ## Install Project Dependencies
 
-1. In a terminal window, change directory into the repository root (for example, cd ~/Downloads/nextstop
+1. In a terminal window, change directory into the repository root (for example, `cd ~/Downloads/nextstop`).
 2. Install my project dependencies by typing `pip install -r requirements.txt`
 
 ## Run our Scheduler
