@@ -34,9 +34,9 @@ class QACountViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         q_query = self.request.query_params.get('q', None)
         if q_query is not None:
-            queryset = Response.objects.raw( 'SELECT survey_response.q_id, survey_response_a.answer_id AS id, COUNT(*) AS total FROM survey_response, survey_response_a WHERE (survey_response.id = survey_response_a.response_id) AND (survey_response.q_id=' + q_query + ') GROUP BY survey_response.q_id, survey_response_a.answer_id ORDER BY survey_response.q_id, id;')
+            queryset = Response.objects.filter(q=q_query).select_related().values('q', 'a', 'a__answer').annotate(total=Count('a')).order_by('q')
         else:
-            queryset = Response.objects.raw( 'SELECT survey_response.q_id, survey_response_a.answer_id AS id, min(survey_answer.answer) AS a_text, COUNT(*) AS total FROM survey_response, survey_response_a, survey_answer WHERE (survey_response.id = survey_response_a.response_id) AND (survey_response_a.answer_id = survey_answer.id) GROUP BY survey_response.q_id, survey_response_a.answer_id ORDER BY survey_response.q_id, id;')
+            queryset = Response.objects.select_related().values('q', 'a', 'a__answer').annotate(total=Count('a')).order_by('q')
         return queryset
 
 class QCountViewSet(viewsets.ReadOnlyModelViewSet):
