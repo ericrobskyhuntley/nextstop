@@ -28,7 +28,7 @@ class RandomCardViewSet(viewsets.ReadOnlyModelViewSet):
 
 class QACountViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Read-only API endpoint returning a list of questions and a total number of responses to each question.
+    Read-only API endpoint returning a list of questions and a count of each possible response to each.
     """
     serializer_class = QACountSerializer
     def get_queryset(self):
