@@ -6,7 +6,7 @@ Backend for [@civic-data-design-lab](http://github.com/civic-data-design-lab)'s 
 
 1. See if homebrew is installed on your Mac (type `brew --version` into a terminal window).
 2. If not, run this command in a terminal window: `/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
-3. In a terminal window, `run brew install sane-backend`
+3. In a terminal window, `run brew install sane-backends`
 
 ## Install PIP (Python Package Manager)
 
