@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Response, Question, Answer
-
+from django.contrib.postgres.fields import ArrayField
 
 class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,15 +18,16 @@ class ResponseSerializer(serializers.ModelSerializer):
         model = Response
         fields = ('id', 'q', 'q_text', 'a', 'gender', 'age', 'zip_code', 'home', 'free_q_text', 'free_resp', 'survey', 's_text', 'timestamp', 'front', 'back', )
 
-class QACountSerializer(serializers.Serializer):
+class AnswerCountSerializer(serializers.Serializer):
 
     q_id = serializers.IntegerField(source='q')
     q_text = serializers.CharField(source='q__question')
     a_id  = serializers.IntegerField(source='a')
     a_text  = serializers.CharField(source='a__answer')
     total = serializers.IntegerField()
+    id_list  = serializers.ListField()
 
-class QCountSerializer(serializers.Serializer):
+class QuestionCountSerializer(serializers.Serializer):
 
     q = serializers.IntegerField()
     q_text  = serializers.SerializerMethodField()

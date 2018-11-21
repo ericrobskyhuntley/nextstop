@@ -11,8 +11,8 @@ router = routers.DefaultRouter()
 router.register(r'responses', views.ResponseViewSet)
 # manually specifying basename is necessary because of the RandomCardViewSet class' custom get_queryset
 router.register(r'random', views.RandomCardViewSet, basename='random-list')
-router.register(r'qcount', views.QCountViewSet)
-router.register(r'qacount', views.QACountViewSet, basename='qa-list')
+router.register(r'qcount', views.QuestionCountViewSet)
+router.register(r'qacount', views.AnswerCountViewSet, basename='qa-list')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

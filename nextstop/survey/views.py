@@ -2,7 +2,8 @@ from django.shortcuts import render
 from rest_framework import  viewsets
 from django.db.models import Count
 from .models import Response
-from .serializers import ResponseSerializer, QCountSerializer, QACountSerializer
+from .serializers import ResponseSerializer, QuestionCountSerializer, AnswerCountSerializer
+from django.contrib.postgres.aggregates.general import ArrayAgg
 
 class ResponseViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -25,23 +26,23 @@ class RandomCardViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = Response.objects.all().order_by('?')[:1]
         return queryset
 
-class QACountViewSet(viewsets.ReadOnlyModelViewSet):
+class AnswerCountViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Read-only API endpoint returning a list of questions and a count of each possible response to each.
     """
-    serializer_class = QACountSerializer
+    serializer_class = AnswerCountSerializer
     def get_queryset(self):
         q_query = self.request.query_params.get('q', None)
         queryset = Response.objects.exclude(a__isnull=True)
         if q_query is not None:
-            queryset = queryset.filter(q=q_query).select_related().values('q', 'a', 'q__question', 'a__answer').annotate(total=Count('a')).order_by('q')
+            queryset = queryset.filter(q=q_query).select_related().values('q', 'a', 'q__question', 'a__answer').annotate(total=Count('a')).annotate(id_list=ArrayAgg('id', distinct=True)).order_by('q')
         else:
-            queryset = queryset.select_related().values('q', 'a', 'q__question', 'a__answer').annotate(total=Count('a')).order_by('q')
+            queryset = queryset.select_related().values('q', 'a', 'q__question', 'a__answer').annotate(total=Count('a')).annotate(id_list=ArrayAgg('id', distinct=True)).order_by('q')
         return queryset
 
-class QCountViewSet(viewsets.ReadOnlyModelViewSet):
+class QuestionCountViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Read-only API endpoint returning a list of questions and a total number of responses to each question.
     """
     queryset = Response.objects.values('q').annotate(total=Count('q')).order_by('q')
-    serializer_class = QCountSerializer
+    serializer_class = QuestionCountSerializer
