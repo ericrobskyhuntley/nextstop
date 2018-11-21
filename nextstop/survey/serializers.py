@@ -21,9 +21,9 @@ class ResponseSerializer(serializers.ModelSerializer):
 class QACountSerializer(serializers.Serializer):
 
     q_id = serializers.IntegerField(source='q')
-    # q_text = serializers.CharField()
+    q_text = serializers.CharField(source='q__question')
     a_id  = serializers.IntegerField(source='a')
-    a_text  = serializers.StringRelatedField(source='a__answer')
+    a_text  = serializers.CharField(source='a__answer')
     total = serializers.IntegerField()
 
 class QCountSerializer(serializers.Serializer):

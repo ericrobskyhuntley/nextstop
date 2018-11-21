@@ -15,11 +15,10 @@ class RandomCardViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Read-only API endpoint returning a random card. An optional `q` query string parameter will filter possible responses to the question to which they respond.
     """
-    # q = self.request.query_params.get('username', None)
-    # queryset = Response.objects.order_by('?')[:1]
     serializer_class = ResponseSerializer
     def get_queryset(self):
         q_id = self.request.query_params.get('q', None)
+        queryset = Response.objects.exclude(a__isnull=True)
         if q_id is not None:
             queryset = Response.objects.filter(q=q_id).order_by('?')[:1]
         else:
@@ -33,10 +32,11 @@ class QACountViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = QACountSerializer
     def get_queryset(self):
         q_query = self.request.query_params.get('q', None)
+        queryset = Response.objects.exclude(a__isnull=True)
         if q_query is not None:
-            queryset = Response.objects.filter(q=q_query).select_related().values('q', 'a', 'a__answer').annotate(total=Count('a')).order_by('q')
+            queryset = queryset.filter(q=q_query).select_related().values('q', 'a', 'q__question', 'a__answer').annotate(total=Count('a')).order_by('q')
         else:
-            queryset = Response.objects.select_related().values('q', 'a', 'a__answer').annotate(total=Count('a')).order_by('q')
+            queryset = queryset.select_related().values('q', 'a', 'q__question', 'a__answer').annotate(total=Count('a')).order_by('q')
         return queryset
 
 class QCountViewSet(viewsets.ReadOnlyModelViewSet):
