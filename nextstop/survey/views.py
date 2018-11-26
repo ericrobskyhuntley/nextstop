@@ -44,5 +44,6 @@ class QuestionCountViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Read-only API endpoint returning a list of questions and a total number of responses to each question.
     """
-    queryset = Response.objects.values('q').annotate(total=Count('q')).order_by('q')
+    queryset = Response.objects.exclude(a__isnull=True)
+    queryset = queryset.values('q').annotate(total=Count('q')).order_by('q')
     serializer_class = QuestionCountSerializer
