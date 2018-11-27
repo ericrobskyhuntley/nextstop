@@ -4,10 +4,10 @@ import datetime
 import glob
 
 age_yDims = np.array([382, 432, 482])
-gdr_yDims = np.array([578])
+gdr_yDims = np.array([563])
 # q3_yDims = np.array([780, 820, 870])
-hom_yDims = np.array([815])
-x_dims = np.array([210, 430, 610])
+hom_yDims = np.array([805])
+x_dims = np.array([215, 433, 615])
 
 f_x_dims = np.array([50, 305])
 f_y_dims = np.array([530, 590, 650])
@@ -27,7 +27,7 @@ blue_s = 96 / 100 * 255
 blue_v = 44 / 100 * 255
 blue = [(blue_h-20, blue_s-20,blue_v-20), (blue_h+20, blue_s+20, blue_v+20)]
 
-INTERVAL = 20
+INTERVAL = 25
 IMG_PATH = ''
 PIXEL_THRESHOLD = 12500
 FRONT_BLUR = 3
@@ -63,7 +63,7 @@ def age_get(dst):
         return "65+"
     else:
         # print(max_test)
-        return "There was a problem."
+        return ""
 
 def gdr_get(dst):
     """
@@ -107,9 +107,9 @@ def hom_get(dst):
                     i_max = i
                     j_max = j
     if (i_max==0) & (j_max==0):
-        return "urban"
-    elif (i_max==1) & (j_max==0):
         return "suburban"
+    elif (i_max==1) & (j_max==0):
+        return "urban"
     elif (i_max==2) & (j_max==0):
         return "rural"
     else:
@@ -214,7 +214,8 @@ def read_front(img):
     return [resp]
 
 def read_back(img):
-    back_proc = image_process(img, 5, 'b')
+    back_proc = image_process(img, 1, 'b')
+    cv2.imwrite('back-test.png', back_proc)
     # num = card.split('-')[0]
     age = age_get(back_proc)
     gdr = gdr_get(back_proc)

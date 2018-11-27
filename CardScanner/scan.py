@@ -6,7 +6,7 @@ import django
 import cv2
 import numpy as np
 from math import floor
-from . import cr, process
+from . import read, process
 
 sys.path.append('/home/cddl/Desktop/nextstop/nextstop')
 os.environ["DJANGO_SETTINGS_MODULE"] = 'nextstop.settings'
@@ -60,12 +60,12 @@ def doc_load(device):
                     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
                     if (i % 2 == 0) | (i == 0):
                         align_image = process.align_images_orb(image, 'nextstop/static/templates/q3_back.jpg')
-                        back = cr.read_back(image)
+                        back = read.read_back(image)
                         cv2.imwrite(f'{floor(i/2)}-back.png', image)
                         # image.save()
                     else:
                         align_image = process.align_images_orb(image, 'nextstop/static/templates/q3_front.jpg')
-                        front = cr.read_front(image)
+                        front = read.read_front(image)
                         cv2.imwrite(f'{floor((i-1)/2)}-front.png', image)
     except StopIteration:
         if (front is not None and back is not None):
