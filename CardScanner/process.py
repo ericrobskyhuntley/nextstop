@@ -16,6 +16,7 @@ def align_images_orb(im, ref):
     Code is based on implementation found here: https://www.learnopencv.com/image-alignment-feature-based-using-opencv-c-python/
     """
     # Convert images to grayscale
+    ref = cv2.imread(ref)
     im_gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
     ref_gray = cv2.cvtColor(ref, cv2.COLOR_BGR2GRAY)
     # Detect ORB features and compute descriptors.
@@ -97,56 +98,6 @@ def bg_trim(im):
     diff = ImageChops.add(diff, diff, 2.0, -100)
     bbox = diff.getbbox()
     if bbox:
-        print(bbox)
         return im.crop(bbox)
     else:
         print("There's been a problem.")
-
-try:
-    # Initiation block.
-    pyinsane2.init()
-    devices = pyinsane2.get_devices()
-    assert(len(devices) > 0)
-    device = devices[0]
-    print(f'PyInsane2 initiatied using {device.name}.')
-
-    try:
-        pyinsane2.set_scanner_opt(device, 'source', ['Automatic Document Feeder(center aligned,Duplex)'])
-    except pyinsane2.PyinsaneException as e:
-        print('No document feeder found', e)
-    # Specify color scanning
-    pyinsane2.set_scanner_opt(device, 'mode', ['24bit Color[Fast]'])
-    # Set scan resolution
-    pyinsane2.set_scanner_opt(device, 'resolution', [200])
-    # set scanner dimensions
-    # pyinsane2.set_scanner_opt(device, 'tl-x', [0])
-    # pyinsane2.set_scanner_opt(device, 'tl-y', [0])
-    # pyinsane2.set_scanner_opt(device, 'br-x', [floor(215.88)])
-    # pyinsane2.set_scanner_opt(device, 'br-y', [floor((1218 / 2795) * 3556)])
-    # pyinsane2.set_scanner_opt(device, 'AutoDocumentSize', [1])
-    # pyinsane2.set_scanner_opt(device, 'AutoDeskew', [1])
-    # specificy scan area
-    # We want full area because otherwise,
-    pyinsane2.maximize_scan_area(device)
-
-    try:
-        scan_session = device.scan(multiple=True)
-        print("Scanning...")
-        while True:
-            try:
-                scan_session.scan.read()
-            except EOFError:
-                print(f'Scanned page {len(scan_session.images)}.')
-    except StopIteration:
-        print(f'Document feeder is empty. Scanned {len(scan_session.images)} pages.')
-    for i in range(0, len(scan_session.images)):
-        image = bg_trim(scan_session.images[i])
-        ts = datetime.datetime.now().timestamp()
-        # image = align_images()
-        if (i % 2 == 0) | (i == 0):
-            image.save(f'assets/focus_group_2/{floor(i/2)}-back.png')
-        else:
-            image.save(f'assets/focus_group_2/{floor((i-1)/2)}-front.png')
-
-finally:
-    pyinsane2.exit()

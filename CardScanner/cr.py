@@ -48,13 +48,13 @@ def age_get(dst):
                 i_max = i
                 j_max = j
     if (i_max==0) & (j_max==0):
-        return "Under 18"
+        return "under-18"
     elif (i_max==1) & (j_max==0):
         return "18-24"
     elif (i_max==2) & (j_max==0):
         return "25-34"
     elif (i_max==0) & (j_max==1):
-        return "35-44"
+        return "36-44"
     elif (i_max==1) & (j_max==1):
         return "45-54"
     elif (i_max==2) & (j_max==1):
@@ -81,14 +81,14 @@ def gdr_get(dst):
                     i_max = i
                     j_max = j
     if (i_max==0) & (j_max==0):
-        return "Nonbinary"
+        return "nonbinary"
     elif (i_max==1) & (j_max==0):
-        return "Female"
+        return "female"
     elif (i_max==2) & (j_max==0):
-        return "Male"
+        return "male"
     else:
         # print(max_test)
-        return "There was a problem."
+        return ""
 
 
 def hom_get(dst):
@@ -107,16 +107,16 @@ def hom_get(dst):
                     i_max = i
                     j_max = j
     if (i_max==0) & (j_max==0):
-        return "Suburban"
+        return "urban"
     elif (i_max==1) & (j_max==0):
-        return "Urban"
+        return "suburban"
     elif (i_max==2) & (j_max==0):
-        return "Rural"
+        return "rural"
     else:
         # print(max_test)
-        return "There was a problem."
+        return ""
 
-def q1_get(dst):
+def q3_get(dst):
     """
     In 2040, the average citizen will...
     """
@@ -143,7 +143,7 @@ def q1_get(dst):
         return "Have no car"
     else:
         # print(max_test)
-        return "There was a problem."
+        return ""
 
 def q2_get(dst):
     """
@@ -180,13 +180,13 @@ def q2_get(dst):
         return "Other"
     else:
         # print(max_test)
-        return "There was a problem."
+        return ""
 
-def image_process(path, b, side):
+def image_process(img, b, side):
     """
     Process image
     """
-    img = cv2.imread(path)
+    # img = cv2.imread(path)
     if (side == 'b'):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         blur = cv2.blur(gray,(b, b))
@@ -208,34 +208,34 @@ def image_process(path, b, side):
 
 
 def read_front(img):
-    front_proc = image_process(img, FRONT_BLUR, 'f')
+    front_proc = image_process(img, 5, 'f')
     # num = card.split('-')[0]
-    resp = q1_get(front_proc)
+    resp = q3_get(front_proc)
     return [resp]
 
 def read_back(img):
-    back_proc = image_process(img, BACK_BLUR, 'b')
+    back_proc = image_process(img, 5, 'b')
     # num = card.split('-')[0]
     age = age_get(back_proc)
     gdr = gdr_get(back_proc)
     home = hom_get(back_proc)
     return [age, gdr, home]
-
-def read_cards(path):
-    """
-    Read card
-    """
-    cards = glob.glob1(path,'*.png')
-    # print(cards)
-    for i, card in enumerate(sorted(cards)):
-        if 'back' in card:
-            front_card = card.replace('back', 'front')
-            # Process card sides.
-            back_proc = image_process(path + card, BACK_BLUR, 'b')
-            front_proc = image_process(path + front_card, FRONT_BLUR, 'f')
-            # num = card.split('-')[0]
-            age = age_get(back_proc)
-            gdr = gdr_get(back_proc)
-            home = hom_get(back_proc)
-            resp = q1_get(front_proc)
-            print([resp, age, gdr, home])
+#
+# def read_cards(path):
+#     """
+#     Read card
+#     """
+#     cards = glob.glob1(path,'*.png')
+#     # print(cards)
+#     for i, card in enumerate(sorted(cards)):
+#         if 'back' in card:
+#             front_card = card.replace('back', 'front')
+#             # Process card sides.
+#             back_proc = image_process(path + card, BACK_BLUR, 'b')
+#             front_proc = image_process(path + front_card, FRONT_BLUR, 'f')
+#             # num = card.split('-')[0]
+#             age = age_get(back_proc)
+#             gdr = gdr_get(back_proc)
+#             home = hom_get(back_proc)
+#             resp = q1_get(front_proc)
+#             print([resp, age, gdr, home])
