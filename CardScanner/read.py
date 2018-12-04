@@ -33,88 +33,124 @@ PIXEL_THRESHOLD = 12500
 FRONT_BLUR = 3
 BACK_BLUR = 1
 
-def age_get(dst):
-    """
-    Age
-    """
-    max_test = 0
-    i_max = -1
-    j_max = -1
-    for i, x in enumerate(x_dims):
-        for j, y in enumerate(age_yDims):
-            crop = dst[y:y+INTERVAL, x:x+INTERVAL]
-            if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
-                max_test = np.sum(crop)
-                i_max = i
-                j_max = j
-    if (i_max==0) & (j_max==0):
-        return "under-18"
-    elif (i_max==1) & (j_max==0):
-        return "18-24"
-    elif (i_max==2) & (j_max==0):
-        return "25-34"
-    elif (i_max==0) & (j_max==1):
-        return "36-44"
-    elif (i_max==1) & (j_max==1):
-        return "45-54"
-    elif (i_max==2) & (j_max==1):
-        return "55-64"
-    elif (i_max==0) & (j_max==2):
-        return "65+"
-    else:
-        # print(max_test)
-        return ""
+HUE_WINDOW = 10
 
-def gdr_get(dst):
-    """
-    Gender
-    """
-    max_test = 0
-    i_max = -1
-    j_max = -1
-    for i, x in enumerate(x_dims):
-        for j, y in enumerate(gdr_yDims):
-            crop = dst[y:y+INTERVAL, x:x+INTERVAL]
-            if (j < 1):
-                if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
-                    max_test = np.sum(crop)
-                    i_max = i
-                    j_max = j
-    if (i_max==0) & (j_max==0):
-        return "nonbinary"
-    elif (i_max==1) & (j_max==0):
-        return "female"
-    elif (i_max==2) & (j_max==0):
-        return "male"
-    else:
-        # print(max_test)
-        return ""
+QUESTION_HUES = [
+    (4, ),
+    (5, ),
+    (6, ),
+    (7, ),
+    (8, ),
+    (9, ),
+    (10, ),
+    (12, ),
+    (13, ),
+    (14, ),
+]
 
+def get_corners(dst):
+    from_corner = 10
+    d = dict()
+    d['height'], d['width'] = dst.shape[:2]
+    d['tl_h'], d['tl_s'], d['tl_v'] = dst[from_corner, from_corner].astype(int)
+    d['bl_h'], d['bl_s'], d['bl_v'] = dst[d['height'] - from_corner, from_corner].astype(int)
+    return d
 
-def hom_get(dst):
-    """
-    Home
-    """
-    max_test = 0
-    i_max = -1
-    j_max = -1
-    for i, x in enumerate(x_dims):
-        for j, y in enumerate(hom_yDims):
-            crop = dst[y:y+INTERVAL, x:x+INTERVAL]
-            if (j < 1):
-                if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
-                    max_test = np.sum(crop)
-                    i_max = i
-                    j_max = j
-    if (i_max==0) & (j_max==0):
-        return "suburban"
-    elif (i_max==1) & (j_max==0):
-        return "urban"
-    elif (i_max==2) & (j_max==0):
-        return "rural"
-    else:
-        # print(max_test)
-        return ""
+def get_question(h):
+    q = None
+    for q_h in QUESTION_HUES:
+        if q_h[1] - HUE_WINDOW < h < q_h[1] + HUE_WINDOWs:
+            q = q_h[0]
+
+def rotate(dst):
+    (h, w) = dst.shape[:2]
+    center = (w / 2, h / 2)
+    M = cv2.getRotationMatrix2D(center, 180, 1.0)
+    dst_rotated = cv2.warpAffine(dst, M, (w, h))
+    return dst_rotated
+
+# def age_get(dst):
+#     """
+#     Age
+#     """
+#     max_test = 0
+#     i_max = -1
+#     j_max = -1
+#     for i, x in enumerate(x_dims):
+#         for j, y in enumerate(age_yDims):
+#             crop = dst[y:y+INTERVAL, x:x+INTERVAL]
+#             if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
+#                 max_test = np.sum(crop)
+#                 i_max = i
+#                 j_max = j
+#     if (i_max==0) & (j_max==0):
+#         return "under-18"
+#     elif (i_max==1) & (j_max==0):
+#         return "18-24"
+#     elif (i_max==2) & (j_max==0):
+#         return "25-34"
+#     elif (i_max==0) & (j_max==1):
+#         return "36-44"
+#     elif (i_max==1) & (j_max==1):
+#         return "45-54"
+#     elif (i_max==2) & (j_max==1):
+#         return "55-64"
+#     elif (i_max==0) & (j_max==2):
+#         return "65+"
+#     else:
+#         # print(max_test)
+#         return ""
+#
+# def gdr_get(dst):
+#     """
+#     Gender
+#     """
+#     max_test = 0
+#     i_max = -1
+#     j_max = -1
+#     for i, x in enumerate(x_dims):
+#         for j, y in enumerate(gdr_yDims):
+#             crop = dst[y:y+INTERVAL, x:x+INTERVAL]
+#             if (j < 1):
+#                 if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
+#                     max_test = np.sum(crop)
+#                     i_max = i
+#                     j_max = j
+#     if (i_max==0) & (j_max==0):
+#         return "nonbinary"
+#     elif (i_max==1) & (j_max==0):
+#         return "female"
+#     elif (i_max==2) & (j_max==0):
+#         return "male"
+#     else:
+#         # print(max_test)
+#         return ""
+#
+#
+# def hom_get(dst):
+#     """
+#     Home
+#     """
+#     max_test = 0
+#     i_max = -1
+#     j_max = -1
+#     for i, x in enumerate(x_dims):
+#         for j, y in enumerate(hom_yDims):
+#             crop = dst[y:y+INTERVAL, x:x+INTERVAL]
+#             if (j < 1):
+#                 if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
+#                     max_test = np.sum(crop)
+#                     i_max = i
+#                     j_max = j
+#     if (i_max==0) & (j_max==0):
+#         return "suburban"
+#     elif (i_max==1) & (j_max==0):
+#         return "urban"
+#     elif (i_max==2) & (j_max==0):
+#         return "rural"
+#     else:
+#         # print(max_test)
+#         return ""
 
 def q3_get(dst):
     """
@@ -145,42 +181,42 @@ def q3_get(dst):
         # print(max_test)
         return ""
 
-def q2_get(dst):
-    """
-    My preferred transport mode(s) in 2040 will be...
-    """
-    max_test = 0
-    i_max = -1
-    j_max = -1
-    for i, x in enumerate(f_x_dims):
-        for j, y in enumerate(f_y_dims):
-            crop = dst[y:y+INTERVAL, x:x+INTERVAL]
-            if (j < 2) or ((j == 2) and (i==0)):
-                if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
-                    max_test = np.sum(crop)
-                    i_max = i
-                    j_max = j
-    if (i_max==0) & (j_max==0):
-        return "AV Buses"
-    elif (i_max==1) & (j_max==0):
-        return "AV Cars"
-    elif (i_max==2) & (j_max==0):
-        return "Scooters"
-    elif (i_max==0) & (j_max==1):
-        return "Subways"
-    elif (i_max==1) & (j_max==1):
-        return "Bikes"
-    elif (i_max==2) & (j_max==1):
-        return "Walking"
-    elif (i_max==0) & (j_max==2):
-        return "Hyperloop"
-    elif (i_max==1) & (j_max==2):
-        return "Train"
-    elif (i_max==2) & (j_max==2):
-        return "Other"
-    else:
-        # print(max_test)
-        return ""
+# def q2_get(dst):
+#     """
+#     My preferred transport mode(s) in 2040 will be...
+#     """
+#     max_test = 0
+#     i_max = -1
+#     j_max = -1
+#     for i, x in enumerate(f_x_dims):
+#         for j, y in enumerate(f_y_dims):
+#             crop = dst[y:y+INTERVAL, x:x+INTERVAL]
+#             if (j < 2) or ((j == 2) and (i==0)):
+#                 if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
+#                     max_test = np.sum(crop)
+#                     i_max = i
+#                     j_max = j
+#     if (i_max==0) & (j_max==0):
+#         return "AV Buses"
+#     elif (i_max==1) & (j_max==0):
+#         return "AV Cars"
+#     elif (i_max==2) & (j_max==0):
+#         return "Scooters"
+#     elif (i_max==0) & (j_max==1):
+#         return "Subways"
+#     elif (i_max==1) & (j_max==1):
+#         return "Bikes"
+#     elif (i_max==2) & (j_max==1):
+#         return "Walking"
+#     elif (i_max==0) & (j_max==2):
+#         return "Hyperloop"
+#     elif (i_max==1) & (j_max==2):
+#         return "Train"
+#     elif (i_max==2) & (j_max==2):
+#         return "Other"
+#     else:
+#         # print(max_test)
+#         return ""
 
 def image_process(img, b, side):
     """
