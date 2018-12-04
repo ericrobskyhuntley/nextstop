@@ -17,15 +17,15 @@ white = [190, 255]
 
 white_hsv = [(0,0,180),(180, 15, 255)]
 black_hsv = [(0,0,0),(180, 255, 100)]
-green_h = 131 / 360 * 180
-green_s = 55 / 100 * 255
-green_v = 64 / 100 * 255
-green = [(green_h-20,green_s-20,green_v-20), (green_h+20, green_s+20, green_v+20)]
+# green_h = 131 / 360 * 180
+# green_s = 55 / 100 * 255
+# green_v = 64 / 100 * 255
+# green = [(green_h-20,green_s-20,green_v-20), (green_h+20, green_s+20, green_v+20)]
 
-blue_h = 220 / 360 * 180
-blue_s = 96 / 100 * 255
-blue_v = 44 / 100 * 255
-blue = [(blue_h-20, blue_s-20,blue_v-20), (blue_h+20, blue_s+20, blue_v+20)]
+# blue_h = 220 / 360 * 180
+# blue_s = 96 / 100 * 255
+# blue_v = 44 / 100 * 255
+# blue = [(blue_h-20, blue_s-20,blue_v-20), (blue_h+20, blue_s+20, blue_v+20)]
 
 INTERVAL = 25
 IMG_PATH = ''
@@ -33,19 +33,19 @@ PIXEL_THRESHOLD = 12500
 FRONT_BLUR = 3
 BACK_BLUR = 1
 
-HUE_WINDOW = 10
+HUE_WINDOW = 5
 
 QUESTION_HUES = [
-    (4, ),
-    (5, ),
-    (6, ),
-    (7, ),
-    (8, ),
-    (9, ),
-    (10, ),
-    (12, ),
-    (13, ),
-    (14, ),
+    (4, np.array([343, 86, 83])),
+    (5, np.array([338, 100, 49])),
+    (6, np.array([52, 84, 87])),
+    (7, np.array([118, 60, 72])),
+    (8, np.array([203, 100, 42])),
+    (9, np.array([287, 64, 48])),
+    (10, np.array([170, 100, 48])),
+    (12, np.array([332, 54, 86])),
+    (13, np.array([208, 70, 67])),
+    (14, np.array([15, 83, 95])),
 ]
 
 def get_corners(dst):
