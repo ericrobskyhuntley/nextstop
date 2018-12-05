@@ -20,24 +20,35 @@ PIXEL_THRESHOLD = 12500
 FRONT_BLUR = 3
 BACK_BLUR = 1
 
-COLOR_WINDOW = 30
+COLOR_WINDOW = 10
+
 
 QUESTION_HUES = [
-    (4, np.array([119, 209, 194])),
-    (5, np.array([120, 250, 67])),
-    (6, np.array([93, 156, 215])),
-    (7, np.array([61, 97, 138])),
-    (8, np.array([17, 180, 66])),
-    (9, np.array([160, 190, 80])),
-    (10, np.array([33, 100, 80])),
-    (12, np.array([126, 145, 208])),
-    (13, np.array([15, 204,131])),
-    (14, np.array([12, 110, 240])),
+    # My preferred transport mode(s) in 2020 will be...
+    (4, np.array([1, 232, 190])),
+    # In 2040, the average person will...
+    (5, np.array([0, 255, 62])),
+    # Responsibility for autonomous vehicle accidents belongs to...
+    (6, np.array([27, 176, 242])),
+    # In 2040, commuting will take...
+    (7, np.array([59, 157, 152])),
+    # In 2040, everyone will have access to...
+    (8, np.array([107, 255, 42])),
+    # The future of mobility will make the world
+    (9, np.array([142, 190,65])),
+    # In the future, my transportation costs will...
+    (10, np.array([88, 255, 62])),
+    # Future mobility options will have the greatest imapact on...
+    (12, np.array([174, 156, 208])),
+    # In 2040...
+    (13, np.array([101, 203, 121])),
+    # Travel in the future will be more dangerous for...
+    (14, np.array([13, 250, 243])),
 ]
 
 def get_corners(dst):
     from_corner = 25
-    box_size = 15
+    box_size = 10
     hsv = cv2.cvtColor(dst, cv2.COLOR_BGR2HSV)
     d = dict()
     d['height'], d['width'] = dst.shape[:2]
@@ -65,15 +76,20 @@ def get_corners(dst):
     return d
 
 def get_question(hsv):
-    print(hsv)
+    # print(hsv)
+    possible_values = np.array([hsv['med'], hsv['tl_hsv'], hsv['tr_hsv'], hsv['bl_hsv'], hsv['br_hsv']])
     q = None
-    for q_h in QUESTION_HUES:
-        q_hsv = q_h[1]
-        lower_bound = q_hsv - COLOR_WINDOW
-        upper_bound = q_hsv + COLOR_WINDOW
-        # print(lower_bound, hsv, upper_bound)
-        if np.all(hsv > lower_bound) and np.all(hsv < q_hsv + COLOR_WINDOW):
-            return q_h
+    for value in possible_values:
+        for question in QUESTION_HUES:
+            # q_hsv = q_hsv[1]
+            lower_bound = question[1] - COLOR_WINDOW
+            upper_bound = question[1] + COLOR_WINDOW
+            # print(lower_bound, value, upper_bound)
+            # print(lower_bound, hsv, upper_bound)
+            if np.all(value > lower_bound) and np.all(value < upper_bound):
+                q = question
+    return q
+
 
 # def age_get(dst):
 #     """

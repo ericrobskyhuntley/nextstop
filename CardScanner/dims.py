@@ -26,7 +26,7 @@ black_hsv = [(0,0,0),(180, 255, 100)]
 
 INTERVAL = 25
 IMG_PATH = ''
-PIXEL_THRESHOLD = 12500
+PIXEL_THRESHOLD = 100
 FRONT_BLUR = 3
 BACK_BLUR = 1
 
@@ -329,8 +329,8 @@ def get_answers(dst, q):
 		"""
 		Future mobility options will have the greatest impact on...
 		"""
-		f_x_dims = np.array([40])
-		f_y_dims = np.array([694, 766, 841, 912])
+		f_x_dims = np.array([68])
+		f_y_dims = np.array([734, 805, 882, 952])
 
 		max_test = 0
 		i_max = -1

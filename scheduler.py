@@ -32,20 +32,21 @@ for i in range(0, len(images), 2):
         print('upside down')
         front = process.rotate(front)
         back = process.rotate(back)
-    # cv2.imwrite('back.png', back)
+    # cv2.imwrite('front.png', front)
     # blur = cv2.blur(front,(3, 3))
     corners = read.get_corners(front)
-    print(corners)
-    question = read.get_question(corners['tl_hsv'])
+    # print(corners)
+    question = read.get_question(corners)
     print(question)
     # Read template for  detected question.
-    ref = 'nextstop/static/templates/11_28_{:02}_front.jpg'.format(question[0])
+    ref = 'nextstop/static/templates/empirical_fg/{:02}_front.jpg'.format(question[0])
     ref_img = cv2.imread(ref)
     aligned = process.align_images_orb(front, ref_img)
+    # cv2.imwrite('{:02}_front.jpg'.format(question[0]), aligned)
     # Mask and blur
-    masked = process.mask_front(aligned, 5,  question[1])
-    cv2.imwrite('masked.jpg', masked)
+    masked = process.mask_front(aligned, 2,  question[1])
     answers = dims.get_answers(masked, question[0])
+    print(answers)
 
 DEVICE = scan.setup()
 

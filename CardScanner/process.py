@@ -9,7 +9,7 @@ import datetime
 MAX_FEATURES = 800
 GOOD_MATCH_PERCENT = 0.05
 
-COLOR_WINDOW = 60
+COLOR_WINDOW = 25
 
 def rotate(dst):
     (h, w) = dst.shape[:2]
