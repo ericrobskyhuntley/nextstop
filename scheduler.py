@@ -13,7 +13,8 @@ images = [cv2.cvtColor(np.array(i), cv2.COLOR_BGR2RGB) for i in images]
 # images_hsv = [cv2.cvtColor(np.array(i), cv2.COLOR_BGR2HSV) for i in images]
 
 for i in range(0, len(images), 2):
-    print(floor(i/2))
+    # card_no = floor(i/2) + 67
+    print(card_no)
     corners = read.get_corners(images[i])
     diff = corners['tl_hsv'][1] - corners['bl_hsv'][1]
     if abs(diff) > 20:
@@ -32,23 +33,22 @@ for i in range(0, len(images), 2):
         print('upside down')
         front = process.rotate(front)
         back = process.rotate(back)
-    # cv2.imwrite('front.png', front)
     # blur = cv2.blur(front,(3, 3))
     corners = read.get_corners(front)
-    # print(corners)
     question = read.get_question(corners)
     print(question)
-    # Read template for  detected question.
-    ref = 'nextstop/static/templates/empirical_fg/{:02}_front.jpg'.format(question[0])
-    ref_img = cv2.imread(ref)
-    aligned = process.align_images_orb(front, ref_img)
-    # cv2.imwrite('{:02}_front.jpg'.format(question[0]), aligned)
+    if question is not None:
+        ref_front = cv2.imread('nextstop/static/templates/11_28_{:02}_front.jpg'.format(question[0]))
+        # ref_back = cv2.imread('nextstop/static/templates/11_28_{:02}_back.jpg'.format(question[0]))
+        aligned_front = process.align_images_orb(front, ref_front)
+        # aligned_back = process.align_images_orb(back, ref_back)
+        # cv2.imwrite('scans/{:02}_front.jpg'.format(card_no), aligned_front)
+        # cv2.imwrite('scans/{:02}_back.jpg'.format(card_no), back)
+    # cv2.imwrite('nextstop/static/templates/empirical_fg/{:02}_back.jpg'.format(card_no), aligned_back)
     # Mask and blur
-    masked = process.mask_front(aligned, 2,  question[1])
+    masked = process.mask_front(aligned_front, 2,  question[1])
     answers = dims.get_answers(masked, question[0])
     print(answers)
-
-DEVICE = scan.setup()
 
 def scan_cards():
     if DEVICE is not None:

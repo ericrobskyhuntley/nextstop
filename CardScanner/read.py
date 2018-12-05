@@ -20,7 +20,7 @@ PIXEL_THRESHOLD = 12500
 FRONT_BLUR = 3
 BACK_BLUR = 1
 
-COLOR_WINDOW = 10
+COLOR_WINDOW = 15
 
 
 QUESTION_HUES = [
@@ -35,13 +35,13 @@ QUESTION_HUES = [
     # In 2040, everyone will have access to...
     (8, np.array([107, 255, 42])),
     # The future of mobility will make the world
-    (9, np.array([142, 190,65])),
+    (9, np.array([142, 192, 70])),
     # In the future, my transportation costs will...
     (10, np.array([88, 255, 62])),
     # Future mobility options will have the greatest imapact on...
     (12, np.array([174, 156, 208])),
     # In 2040...
-    (13, np.array([101, 203, 121])),
+    (13, np.array([106, 205, 120])),
     # Travel in the future will be more dangerous for...
     (14, np.array([13, 250, 243])),
 ]
@@ -78,6 +78,7 @@ def get_corners(dst):
 def get_question(hsv):
     # print(hsv)
     possible_values = np.array([hsv['med'], hsv['tl_hsv'], hsv['tr_hsv'], hsv['bl_hsv'], hsv['br_hsv']])
+    print(hsv)
     q = None
     for value in possible_values:
         for question in QUESTION_HUES:
