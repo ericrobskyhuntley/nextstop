@@ -4,49 +4,48 @@ import time
 from os import listdir
 import cv2
 import numpy as np
-# import logging
-
-# logging.basicConfig(
-#         filename='overnight-scanner.log',
-#         level=logging.INFO,
-#         format='%(asctime)s %(message)s'
-#     )
+from math import floor
 
 DEVICE = scan.setup()
 images = scan.scan_cards(DEVICE)
-# for i, img in enumerate(images):
-#     # Programmatically trim image.
-#     img = process.bg_trim(img)
-#     # Convert PIL image to OpenCV
-#     img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2HSV)
-#     # Determine question.
-#     read.get_question(img)
-
 images = [process.bg_trim(i) for i in images]
-images = [cv2.cvtColor(np.array(i), cv2.COLOR_BGR2HSV) for i in images]
-
+images = [cv2.cvtColor(np.array(i), cv2.COLOR_BGR2RGB) for i in images]
+# images_hsv = [cv2.cvtColor(np.array(i), cv2.COLOR_BGR2HSV) for i in images]
 
 for i in range(0, len(images), 2):
+    print(floor(i/2))
     corners = read.get_corners(images[i])
-    diff = corners['tl_s'] - corners['bl_s']
+    diff = corners['tl_hsv'][1] - corners['bl_hsv'][1]
     if abs(diff) > 20:
+        print("front forward")
         front = images[i + 1]
         back = images[i]
         # print("wobble")
     else:
+        print("back forward")
         front = images[i]
         back = images[i + 1]
-        corners = read.get_corners(back)
-        diff = corners['tl_s'] - corners['bl_s']
+    corners = read.get_corners(back)
+    diff = corners['tl_hsv'][1] - corners['bl_hsv'][1]
+    # rotate if necessary
     if diff < -20:
         print('upside down')
-        front = read.rotate(front)
-        question = read.get_question(corners['tl_h'])
-        back = read.rotate(back)
-    # cv2.imshow("back", back)
-    # cv2.imshow("front", front)
-# cv2.imwrite('back.jpg', back)
-# cv2.imwrite('front.jpg', front)
+        front = process.rotate(front)
+        back = process.rotate(back)
+    # cv2.imwrite('back.png', back)
+    # blur = cv2.blur(front,(3, 3))
+    corners = read.get_corners(front)
+    print(corners)
+    question = read.get_question(corners['tl_hsv'])
+    print(question)
+    # Read template for  detected question.
+    ref = 'nextstop/static/templates/11_28_{:02}_front.jpg'.format(question[0])
+    ref_img = cv2.imread(ref)
+    aligned = process.align_images_orb(front, ref_img)
+    # Mask and blur
+    masked = process.mask_front(aligned, 5,  question[1])
+    cv2.imwrite('masked.jpg', masked)
+    answers = dims.get_answers(masked, question[0])
 
 DEVICE = scan.setup()
 

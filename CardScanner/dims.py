@@ -1,5 +1,35 @@
 import numpy as np
 
+age_yDims = np.array([382, 432, 482])
+gdr_yDims = np.array([563])
+# q3_yDims = np.array([780, 820, 870])
+hom_yDims = np.array([805])
+x_dims = np.array([215, 433, 615])
+
+f_x_dims = np.array([50, 305])
+f_y_dims = np.array([530, 590, 650])
+
+black =  [0, 120]
+white = [190, 255]
+
+white_hsv = [(0,0,180),(180, 15, 255)]
+black_hsv = [(0,0,0),(180, 255, 100)]
+# green_h = 131 / 360 * 180
+# green_s = 55 / 100 * 255
+# green_v = 64 / 100 * 255
+# green = [(green_h-20,green_s-20,green_v-20), (green_h+20, green_s+20, green_v+20)]
+
+# blue_h = 220 / 360 * 180
+# blue_s = 96 / 100 * 255
+# blue_v = 44 / 100 * 255
+# blue = [(blue_h-20, blue_s-20,blue_v-20), (blue_h+20, blue_s+20, blue_v+20)]
+
+INTERVAL = 25
+IMG_PATH = ''
+PIXEL_THRESHOLD = 12500
+FRONT_BLUR = 3
+BACK_BLUR = 1
+
 def get_answers(dst, q):
 	if (q==5):
 		"""

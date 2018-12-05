@@ -2,21 +2,8 @@ import cv2
 import numpy as np
 import datetime
 import glob
+from math import floor
 
-age_yDims = np.array([382, 432, 482])
-gdr_yDims = np.array([563])
-# q3_yDims = np.array([780, 820, 870])
-hom_yDims = np.array([805])
-x_dims = np.array([215, 433, 615])
-
-f_x_dims = np.array([50, 305])
-f_y_dims = np.array([530, 590, 650])
-
-black =  [0, 120]
-white = [190, 255]
-
-white_hsv = [(0,0,180),(180, 15, 255)]
-black_hsv = [(0,0,0),(180, 255, 100)]
 # green_h = 131 / 360 * 180
 # green_s = 55 / 100 * 255
 # green_v = 64 / 100 * 255
@@ -33,41 +20,60 @@ PIXEL_THRESHOLD = 12500
 FRONT_BLUR = 3
 BACK_BLUR = 1
 
-HUE_WINDOW = 5
+COLOR_WINDOW = 30
 
 QUESTION_HUES = [
-    (4, np.array([343, 86, 83])),
-    (5, np.array([338, 100, 49])),
-    (6, np.array([52, 84, 87])),
-    (7, np.array([118, 60, 72])),
-    (8, np.array([203, 100, 42])),
-    (9, np.array([287, 64, 48])),
-    (10, np.array([170, 100, 48])),
-    (12, np.array([332, 54, 86])),
-    (13, np.array([208, 70, 67])),
-    (14, np.array([15, 83, 95])),
+    (4, np.array([119, 209, 194])),
+    (5, np.array([120, 250, 67])),
+    (6, np.array([93, 156, 215])),
+    (7, np.array([61, 97, 138])),
+    (8, np.array([17, 180, 66])),
+    (9, np.array([160, 190, 80])),
+    (10, np.array([33, 100, 80])),
+    (12, np.array([126, 145, 208])),
+    (13, np.array([15, 204,131])),
+    (14, np.array([12, 110, 240])),
 ]
 
 def get_corners(dst):
-    from_corner = 10
+    from_corner = 25
+    box_size = 15
+    hsv = cv2.cvtColor(dst, cv2.COLOR_BGR2HSV)
     d = dict()
     d['height'], d['width'] = dst.shape[:2]
-    d['tl_h'], d['tl_s'], d['tl_v'] = dst[from_corner, from_corner].astype(int)
-    d['bl_h'], d['bl_s'], d['bl_v'] = dst[d['height'] - from_corner, from_corner].astype(int)
+    tl_hsv = hsv[from_corner:from_corner+box_size, from_corner:from_corner+box_size]
+    tl_hsv = np.median(tl_hsv, axis=0)
+    tl_hsv = np.median(tl_hsv, axis=0)
+    d['tl_hsv'] = tl_hsv
+    tr_hsv = hsv[from_corner:from_corner+box_size, d['width']-from_corner-box_size:d['width']-from_corner]
+    tr_hsv = np.median(tr_hsv, axis=0)
+    tr_hsv = np.median(tr_hsv, axis=0)
+    d['tr_hsv'] = tr_hsv
+    bl_hsv = hsv[d['height']-from_corner-box_size:d['height']-from_corner, from_corner:from_corner + box_size]
+    bl_hsv = np.median(bl_hsv, axis=0)
+    bl_hsv = np.median(bl_hsv, axis=0)
+    d['bl_hsv'] = bl_hsv
+    br_hsv = hsv[d['height']-from_corner-box_size:d['height']-from_corner, d['width']-from_corner-box_size:d['width']-from_corner]
+    br_hsv = np.median(br_hsv, axis=0)
+    br_hsv = np.median(br_hsv, axis=0)
+    d['br_hsv'] = br_hsv
+    med = np.median(np.array([tl_hsv, tr_hsv, bl_hsv, br_hsv]), axis=0)
+    d['med'] = med
+    # # .mean().astype(int)
+    # # .mean().astype(int)
+    # print(d)
     return d
 
-def get_question(h):
+def get_question(hsv):
+    print(hsv)
     q = None
     for q_h in QUESTION_HUES:
-        if q_h[1] - HUE_WINDOW < h < q_h[1] + HUE_WINDOWs:
-            q = q_h[0]
-
-def rotate(dst):
-    (h, w) = dst.shape[:2]
-    center = (w / 2, h / 2)
-    M = cv2.getRotationMatrix2D(center, 180, 1.0)
-    dst_rotated = cv2.warpAffine(dst, M, (w, h))
-    return dst_rotated
+        q_hsv = q_h[1]
+        lower_bound = q_hsv - COLOR_WINDOW
+        upper_bound = q_hsv + COLOR_WINDOW
+        # print(lower_bound, hsv, upper_bound)
+        if np.all(hsv > lower_bound) and np.all(hsv < q_hsv + COLOR_WINDOW):
+            return q_h
 
 # def age_get(dst):
 #     """
@@ -218,45 +224,21 @@ def q3_get(dst):
 #         # print(max_test)
 #         return ""
 
-def image_process(img, b, side):
-    """
-    Process image
-    """
-    # img = cv2.imread(path)
-    if (side == 'b'):
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        blur = cv2.blur(gray,(b, b))
-        mask_white = cv2.inRange(blur, white_hsv[0], white_hsv[1])
-        mask_black = cv2.inRange(blur, black_hsv[0], black_hsv[1])
-        mask = cv2.bitwise_or(mask_white, mask_black)
-        # mask_inv = cv2.bitwise_or(mask_black, mask_white)
-    elif (side == 'f'):
-        col = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        blur = cv2.blur(col,(b, b))
-        mask_white = cv2.inRange(blur, white_hsv[0], white_hsv[1])
-        mask_color = cv2.inRange(blur, green[0], green[1])
-        mask = cv2.bitwise_or(mask_color, mask_white)
-    else:
-        print("Specify front or back.")
-    mask = cv2.bitwise_not(mask)
-    # cv2.imwrite('test.png', mask)
-    return cv2.bitwise_and(blur, blur, mask=mask)
 
-
-def read_front(img):
-    front_proc = image_process(img, 5, 'f')
-    # num = card.split('-')[0]
-    resp = q3_get(front_proc)
-    return [resp]
-
-def read_back(img):
-    back_proc = image_process(img, 1, 'b')
-    cv2.imwrite('back-test.png', back_proc)
-    # num = card.split('-')[0]
-    age = age_get(back_proc)
-    gdr = gdr_get(back_proc)
-    home = hom_get(back_proc)
-    return [age, gdr, home]
+# def read_front(img):
+#     front_proc = image_process(img, 5, 'f')
+#     # num = card.split('-')[0]
+#     resp = q3_get(front_proc)
+#     return [resp]
+#
+# def read_back(img):
+#     back_proc = image_process(img, 1, 'b')
+#     cv2.imwrite('back-test.png', back_proc)
+#     # num = card.split('-')[0]
+#     age = age_get(back_proc)
+#     gdr = gdr_get(back_proc)
+#     home = hom_get(back_proc)
+#     return [age, gdr, home]
 #
 # def read_cards(path):
 #     """

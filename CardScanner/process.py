@@ -7,7 +7,16 @@ import cv2
 import datetime
 
 MAX_FEATURES = 800
-GOOD_MATCH_PERCENT = 0.15
+GOOD_MATCH_PERCENT = 0.05
+
+COLOR_WINDOW = 60
+
+def rotate(dst):
+    (h, w) = dst.shape[:2]
+    center = (w / 2, h / 2)
+    M = cv2.getRotationMatrix2D(center, 180, 1.0)
+    dst_rotated = cv2.warpAffine(dst, M, (w, h))
+    return dst_rotated
 
 def align_images_orb(im, ref):
     """
@@ -16,7 +25,7 @@ def align_images_orb(im, ref):
     Code is based on implementation found here: https://www.learnopencv.com/image-alignment-feature-based-using-opencv-c-python/
     """
     # Convert images to grayscale
-    ref = cv2.imread(ref)
+    # ref = cv2.imread(ref)
     im_gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
     ref_gray = cv2.cvtColor(ref, cv2.COLOR_BGR2GRAY)
     # Detect ORB features and compute descriptors.
@@ -57,6 +66,7 @@ def align_images_ecc(im, ref):
     Code is based on implementation found here: https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
     """
     # Convert images to grayscale
+    # ref = cv2.imread(r)
     im_gray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
     ref_gray = cv2.cvtColor(ref,cv2.COLOR_BGR2GRAY)
     # Find size of ref
@@ -101,3 +111,27 @@ def bg_trim(im):
         return im.crop(bbox)
     else:
         print("There's been a problem.")
+
+white_hsv = [(0,0,180),(180, 15, 255)]
+black_hsv = [(0,0,0),(180, 255, 100)]
+
+def mask_front(img, b, color):
+    """
+    Process image
+    """
+    # img = cv2.imread(path)
+    # if (side == 'b'):
+    #     gray = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    #     blur = cv2.blur(gray,(b, b))
+    #     mask_white = cv2.inRange(blur, white_hsv[0], white_hsv[1])
+    #     mask_black = cv2.inRange(blur, black_hsv[0], black_hsv[1])
+    #     mask = cv2.bitwise_or(mask_white, mask_black)
+        # mask_inv = cv2.bitwise_or(mask_black, mask_white)
+    # elif (side == 'f'):
+    col = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    blur = cv2.blur(col,(b, b))
+    mask_white = cv2.inRange(blur, white_hsv[0], white_hsv[1])
+    mask_color = cv2.inRange(blur, color - COLOR_WINDOW, color + COLOR_WINDOW)
+    mask = cv2.bitwise_or(mask_color, mask_white)
+    mask = cv2.bitwise_not(mask)
+    return cv2.bitwise_and(blur, blur, mask=mask)
