@@ -34,7 +34,6 @@ def align_images_orb(im, ref):
     matches = matches[:num_good_matches]
     # Draw top matchesints
     im_matches = cv2.drawMatches(im, keypoints_im, ref, keypoints_ref, matches, None)
-    cv2.imwrite("matches.jpg", im_matches)
     # Extract location of good matches
     points_im = np.zeros((len(matches), 2), dtype=np.float32)
     points_ref = np.zeros((len(matches), 2), dtype=np.float32)
@@ -94,15 +93,17 @@ def bg_trim(im):
     """
     # This initial crop is hacky and stupid (should just be able to set device
     # options) but scanner isn't 'hearing' those settings.
-    im = im.crop((420, 0, 1275, 1200))
-    bg = Image.new(im.mode, im.size, im.getpixel((2, 2)))
-    diff = ImageChops.difference(im, bg)
-    diff = ImageChops.add(diff, diff, 2.0, -100)
-    bbox = diff.getbbox()
-    if bbox:
-        return im.crop(bbox)
-    else:
-        print("There's been a problem.")
+    # w,h = im.size
+    im = im.crop((443, 0, 1242, 1200))
+    # bg = Image.new(im.mode, im.size, im.getpixel((2, 2)))
+    # diff = ImageChops.difference(im, bg)
+    # diff = ImageChops.add(diff, diff, 2.0, -100)
+    # bbox = diff.getbbox()
+    return im
+    # if bbox:
+    #     return im
+    # else:
+    #     print("There's been a problem.")
 
 white_hsv = [(0,0,180),(180, 15, 255)]
 black_hsv = [(0,0,0),(180, 255, 100)]

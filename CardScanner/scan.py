@@ -1,16 +1,25 @@
 import pyinsane2
+from . import read, SCAN_DIR
 
 def setup():
     pyinsane2.init()
     devices = pyinsane2.get_devices()
+    # dir(devices[0])
+    devices[0].options
+
     try:
         assert(len(devices) > 0)
         device = devices[0]
+        # device.options['AutoDocumentSize']
         # Specify color scanning
         pyinsane2.set_scanner_opt(device, 'mode', ['24bit Color[Fast]'])
         # Set scan resolution
         pyinsane2.set_scanner_opt(device, 'resolution', [200])
-        pyinsane2.set_scanner_opt(device, 'MultifeedDetection', [1])
+        # pyinsane2.set_scanner_opt(device, 'MultifeedDetection', [0])
+        # pyinsane2.set_scanner_opt(device, 'AutoDeskew', [1])
+        # pyinsane2.set_scanner_opt(device, 'AutoDocumentSize', [1])
+
+        # device.options
         # Set scan area
         pyinsane2.maximize_scan_area(device)
         try:
@@ -24,8 +33,6 @@ def setup():
         pyinsane2.exit()
 
 def scan_cards(device):
-    front = None
-    back = None
     try:
         scan_session = device.scan(multiple=True)
         print("Scanning ...")
@@ -35,36 +42,6 @@ def scan_cards(device):
             except EOFError:
                 print ("hi!")
     except StopIteration:
-        return scan_session.images
+        im_list = scan_session.images
         pyinsane2.exit()
-
-# def doc_load(device):
-#     front = None
-#     back = None
-#     try:
-#         scan_session = device.scan(multiple=True)
-#         print("Scanning ...")
-#         while True:
-#             try:
-#                 scan_session.scan.read()
-#             except EOFError:
-#                 print("Got page %d" % (len(scan_session.images)))
-#                 for i in range(0, len(scan_session.images)):
-#                     image = scan_session.images[i]
-#                     # Programmatically trim image.
-#                     image = process.bg_trim(image)
-#                     # Convert PIL image to OpenCV
-#                     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-#                     if (i % 2 == 0) | (i == 0):
-#                         # align_image = process.align_images_orb(image, 'nextstop/static/templates/q3_back.jpg')
-#                         # back = read.read_back(image)
-#                         cv2.imwrite(f'{floor(i/2)}-back.png', image)
-#                         # image.save()
-#                     else:
-#                         # align_image = process.align_images_orb(image, 'nextstop/static/templates/q3_front.jpg')
-#                         # front = read.read_front(image)
-#                         cv2.imwrite(f'{floor((i-1)/2)}-front.png', image)
-#     except StopIteration:
-#         # if (front is not None and back is not None):
-#         #     print(front, back)
-#         pyinsane2.exit()
+        return im_list

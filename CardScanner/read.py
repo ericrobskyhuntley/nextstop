@@ -1,46 +1,30 @@
 import cv2
 import numpy as np
-from . import CHECKBOX_SIZE, CHECKBOX_THRESH, Q_COLOR_WINDOW
-
-QUESTION_HUES = [
-    # My preferred transport mode(s) in 2020 will be...
-    (4, np.array([1, 232, 190])),
-    # In 2040, the average person will...
-    (5, np.array([0, 255, 62])),
-    # Responsibility for autonomous vehicle accidents belongs to...
-    (6, np.array([27, 176, 242])),
-    # In 2040, commuting will take...
-    (7, np.array([60, 135, 150])),
-    # In 2040, everyone will have access to...
-    (8, np.array([107, 255, 42])),
-    # The future of mobility will make the world
-    (9, np.array([142, 192, 70])),
-    # In the future, my transportation costs will...
-    (10, np.array([88, 255, 62])),
-    # Future mobility options will have the greatest imapact on...
-    (12, np.array([174, 156, 208])),
-    # In 2040...
-    (13, np.array([106, 205, 120])),
-    # Travel in the future will be more dangerous for...
-    (14, np.array([13, 250, 243])),
-]
+from . import CHECKBOX_SIZE, CHECKBOX_THRESH, Q_COLOR_WINDOW, QUESTION_HUES, ALIGNED_DIR, SERVER_URL, process
+from glob import glob
+import os
+import json
+import uuid
+from datetime import datetime
+import pytz
 
 def get_corners(img):
-    from_corner = 25
+    t_from_corner = 100
+    b_from_corner = 25
     box_size = 10
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     d = dict()
     d['height'], d['width'] = img.shape[:2]
-    tl_hsv = hsv[from_corner:from_corner+box_size+75, from_corner:from_corner+box_size+75]
+    tl_hsv = hsv[t_from_corner:t_from_corner + box_size, t_from_corner:t_from_corner+box_size]
     tl_hsv = np.median(np.median(tl_hsv, axis=0), axis=0)
     d['tl_hsv'] = tl_hsv
-    tr_hsv = hsv[from_corner:from_corner+box_size+75, d['width']-from_corner-box_size-75:d['width']-from_corner]
+    tr_hsv = hsv[t_from_corner:t_from_corner+box_size, d['width']-t_from_corner-box_size:d['width']-t_from_corner]
     tr_hsv = np.median(np.median(tr_hsv, axis=0), axis=0)
     d['tr_hsv'] = tr_hsv
-    bl_hsv = hsv[d['height']-from_corner-box_size:d['height']-from_corner, from_corner:from_corner + box_size]
+    bl_hsv = hsv[d['height']-b_from_corner-box_size:d['height']-b_from_corner, b_from_corner:b_from_corner + box_size]
     bl_hsv = np.median(np.median(bl_hsv, axis=0), axis=0)
     d['bl_hsv'] = bl_hsv
-    br_hsv = hsv[d['height']-from_corner-box_size:d['height']-from_corner, d['width']-from_corner-box_size:d['width']-from_corner]
+    br_hsv = hsv[d['height']-b_from_corner-box_size:d['height']-b_from_corner, d['width']-b_from_corner-box_size:d['width']-b_from_corner]
     br_hsv = np.median(np.median(br_hsv, axis=0), axis=0)
     d['br_hsv'] = br_hsv
     med = np.median(np.array([tl_hsv, tr_hsv, bl_hsv, br_hsv]), axis=0)
@@ -49,7 +33,6 @@ def get_corners(img):
 
 def get_question(hsv):
     possible_values = np.array([hsv['med'], hsv['tl_hsv'], hsv['tr_hsv'], hsv['bl_hsv'], hsv['br_hsv']])
-    print(hsv)
     q = None
     for value in possible_values:
         for question in QUESTION_HUES:
@@ -64,8 +47,8 @@ def get_answers(dst, q):
 		"""
 		In 2040, the average person will...
 		"""
-		f_x_dims = np.array([68, 333])
-		f_y_dims = np.array([724, 795, 868])
+		f_x_dims = np.array([45, 308])
+		f_y_dims = np.array([700, 770, 843])
 		answers = []
 		for i, x in enumerate(f_x_dims):
 			for j, y in enumerate(f_y_dims):
@@ -91,8 +74,8 @@ def get_answers(dst, q):
 		My preferred transport mode(s) in 2040 will be. . .
 		"""
 		answers = []
-		f_x_dims = np.array([70, 472])
-		f_y_dims = np.array([644, 704, 766, 825, 885, 944])
+		f_x_dims = np.array([45, 447])
+		f_y_dims = np.array([619, 679, 741, 800, 860, 920])
 		for i, x in enumerate(f_x_dims):
 			for j, y in enumerate(f_y_dims):
 				crop = dst[y:y+CHECKBOX_SIZE, x:x+CHECKBOX_SIZE]
@@ -125,8 +108,8 @@ def get_answers(dst, q):
 		"""
 		In 2040, everyone will have access to...
 		"""
-		f_x_dims = np.array([67, 473])
-		f_y_dims = np.array([646, 706, 765, 825, 883, 943])
+		f_x_dims = np.array([45, 448])
+		f_y_dims = np.array([621, 781, 740, 800, 858, 918])
 		answers = []
 		# max_test = 0
 		# i_max = -1
@@ -164,8 +147,8 @@ def get_answers(dst, q):
 		"""
 		In 2040...
 		"""
-		f_x_dims = np.array([72, 182])
-		f_y_dims = np.array([607, 679, 753, 828, 902])
+		f_x_dims = np.array([45, 157])
+		f_y_dims = np.array([582, 654, 728, 803, 977])
 
 		max_test = 0
 		i_max = -1
@@ -195,8 +178,8 @@ def get_answers(dst, q):
 		"""
 		Travel in the future will be more dangerous for...
 		"""
-		f_x_dims = np.array([68, 333, 457, 548])
-		f_y_dims = np.array([802, 874])
+		f_x_dims = np.array([44, 308, 432, 523])
+		f_y_dims = np.array([777, 849])
 
 		max_test = 0
 		i_max = -1
@@ -226,8 +209,8 @@ def get_answers(dst, q):
 		"""
 		Responsibility for autonomous vehicle accidents belongs to...
 		"""
-		f_x_dims = np.array([71])
-		f_y_dims = np.array([725, 785, 843, 900, 958])
+		f_x_dims = np.array([45])
+		f_y_dims = np.array([700, 760, 818, 875, 933])
 		max_test = 0
 		i_max = -1
 		j_max = -1
@@ -255,8 +238,8 @@ def get_answers(dst, q):
 		"""
 		In the future, my transportation costs will...
 		"""
-		f_x_dims = np.array([74])
-		f_y_dims = np.array([714, 787, 864])
+		f_x_dims = np.array([47])
+		f_y_dims = np.array([689, 762, 839])
 		max_test = 0
 		i_max = -1
 		j_max = -1
@@ -281,8 +264,8 @@ def get_answers(dst, q):
 		"""
 		In 2040, commuting will take...
 		"""
-		f_x_dims = np.array([70])
-		f_y_dims = np.array([652, 723, 799, 870, 941])
+		f_x_dims = np.array([45])
+		f_y_dims = np.array([627, 698, 774, 845, 916])
 
 		max_test = 0
 		i_max = -1
@@ -312,8 +295,8 @@ def get_answers(dst, q):
 		"""
 		The future of mobility will make the world...
 		"""
-		f_x_dims = np.array([66])
-		f_y_dims = np.array([721, 793, 869])
+		f_x_dims = np.array([44])
+		f_y_dims = np.array([696, 768, 844])
 
 		max_test = 0
 		i_max = -1
@@ -339,8 +322,8 @@ def get_answers(dst, q):
 		"""
 		Future mobility options will have the greatest impact on...
 		"""
-		f_x_dims = np.array([68])
-		f_y_dims = np.array([734, 805, 882, 952])
+		f_x_dims = np.array([44])
+		f_y_dims = np.array([711, 780, 857, 927])
 
 		max_test = 0
 		i_max = -1
@@ -366,3 +349,69 @@ def get_answers(dst, q):
 			return []
 	else:
 		return []
+
+def get_file_list(dir):
+    file_list = glob(dir)
+    file_list = sorted(file_list, key=str.lower)
+    return file_list
+
+def read_from_disk(list):
+    # print(card_no)
+    with open('read.json', 'w') as f:
+        for i in range(0, len(list), 2):
+            print(list[i])
+            front_idx = i
+            back_idx = i + 1
+            tz = pytz.timezone('America/New_York')
+            timestamp = datetime.fromtimestamp(os.path.getmtime(list[front_idx]), tz).isoformat()
+            front = cv2.imread(list[front_idx])
+            back = cv2.imread(list[back_idx])
+            corners = get_corners(front)
+            diff = corners['tl_hsv'][1] - corners['bl_hsv'][1]
+            if abs(diff) > 20:
+                print("front forward")
+                front, back = back, front
+                front_idx, back_idx = back_idx, front_idx
+                # print("wobble")
+            else:
+                print("back forward")
+            corners = get_corners(back)
+            diff = corners['tl_hsv'][1] - corners['bl_hsv'][1]
+            # rotate if necessary
+            if diff < -20:
+                print('upside down')
+                front = process.rotate(front)
+                back = process.rotate(back)
+            # blur = cv2.blur(front,(3, 3))
+            corners = get_corners(front)
+            # print(corners)
+            question = get_question(corners)
+            # print(question)
+            if question is not None:
+                front_file = os.path.basename(list[front_idx]).replace('a','front').replace('b','front')
+                back_file = os.path.basename(list[front_idx]).replace('a','back').replace('b','back')
+                ref_front = cv2.imread('nextstop/static/templates/11_28_{:02}_front.jpg'.format(question[0]))
+                ref_h, ref_w = ref_front.shape[0], ref_front.shape[1]
+                ref_front = ref_front[0+25:ref_h-25, 0+25:ref_w-25]
+                aligned_front = process.align_images_orb(front, ref_front)
+                cv2.imwrite(ALIGNED_DIR+front_file, aligned_front)
+                cv2.imwrite(ALIGNED_DIR+back_file, back)
+                masked = process.mask_front(aligned_front, 2,  question[1])
+                answers = get_answers(masked, question[0])
+                # print(answers)
+                print(str(timestamp))
+                f.write(json.dumps({
+                    'id': str(uuid.uuid4()),
+                    'q': question[0],
+                    'a': answers,
+                    'gender': '',
+                    'age': '',
+                    'zip_code': '',
+                    'home': '',
+                    'free_q_id': 2,
+                    'free_resp': '',
+                    'survey_id': 6,
+                    'front': SERVER_URL + front_file,
+                    'back': SERVER_URL + back_file,
+                    'timestamp': str(timestamp)
+                }, default=str) + "\n")
