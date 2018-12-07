@@ -1,9 +1,6 @@
 import cv2
 import numpy as np
-
-INTERVAL = 23
-PIXEL_THRESHOLD = 300
-COLOR_WINDOW = 15
+from . import CHECKBOX_SIZE, CHECKBOX_THRESH, Q_COLOR_WINDOW
 
 QUESTION_HUES = [
     # My preferred transport mode(s) in 2020 will be...
@@ -31,9 +28,9 @@ QUESTION_HUES = [
 def get_corners(img):
     from_corner = 25
     box_size = 10
-    hsv = cv2.cvtColor(img, axis=0), cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     d = dict()
-    d['height'], d['width'] = dst.shape[:2]
+    d['height'], d['width'] = img.shape[:2]
     tl_hsv = hsv[from_corner:from_corner+box_size+75, from_corner:from_corner+box_size+75]
     tl_hsv = np.median(np.median(tl_hsv, axis=0), axis=0)
     d['tl_hsv'] = tl_hsv
@@ -51,14 +48,13 @@ def get_corners(img):
     return d
 
 def get_question(hsv):
-    # print(hsv)
     possible_values = np.array([hsv['med'], hsv['tl_hsv'], hsv['tr_hsv'], hsv['bl_hsv'], hsv['br_hsv']])
     print(hsv)
     q = None
     for value in possible_values:
         for question in QUESTION_HUES:
-            lower_bound = question[1] - COLOR_WINDOW
-            upper_bound = question[1] + COLOR_WINDOW
+            lower_bound = question[1] - Q_COLOR_WINDOW
+            upper_bound = question[1] + Q_COLOR_WINDOW
             if np.all(value > lower_bound) and np.all(value < upper_bound):
                 q = question
     return q
@@ -73,9 +69,9 @@ def get_answers(dst, q):
 		answers = []
 		for i, x in enumerate(f_x_dims):
 			for j, y in enumerate(f_y_dims):
-				crop = dst[y:y+INTERVAL, x:x+INTERVAL]
+				crop = dst[y:y+CHECKBOX_SIZE, x:x+CHECKBOX_SIZE]
 				if (j < 2) or ((j == 2) and (i==0)):
-					if (np.sum(crop) > PIXEL_THRESHOLD):
+					if (np.sum(crop) > CHECKBOX_THRESH):
 						# max_test = np.sum(crop)
 						# i_max = i
 						# j_max = j
@@ -99,9 +95,9 @@ def get_answers(dst, q):
 		f_y_dims = np.array([644, 704, 766, 825, 885, 944])
 		for i, x in enumerate(f_x_dims):
 			for j, y in enumerate(f_y_dims):
-				crop = dst[y:y+INTERVAL, x:x+INTERVAL]
+				crop = dst[y:y+CHECKBOX_SIZE, x:x+CHECKBOX_SIZE]
 				if (j < 5) or ((j == 5) and (i==1)):
-					if (np.sum(crop) > PIXEL_THRESHOLD):
+					if (np.sum(crop) > CHECKBOX_THRESH):
 						if (i==0) & (j==0):
 							answers.append(15) #av bus
 						elif (i==0) & (j==1):
@@ -137,9 +133,9 @@ def get_answers(dst, q):
 		# j_max = -1
 		for i, x in enumerate(f_x_dims):
 			for j, y in enumerate(f_y_dims):
-				crop = dst[y:y+INTERVAL, x:x+INTERVAL]
+				crop = dst[y:y+CHECKBOX_SIZE, x:x+CHECKBOX_SIZE]
 				if (j < 5) or ((j == 5) and (i==1)):
-					if (np.sum(crop) > PIXEL_THRESHOLD):
+					if (np.sum(crop) > CHECKBOX_THRESH):
 						if (i==0) & (j==0):
 							answers.append(15) #av bus
 						elif (i==0) & (j==1):
@@ -176,9 +172,9 @@ def get_answers(dst, q):
 		j_max = -1
 		for i, x in enumerate(f_x_dims):
 			for j, y in enumerate(f_y_dims):
-				crop = dst[y:y+INTERVAL, x:x+INTERVAL]
+				crop = dst[y:y+CHECKBOX_SIZE, x:x+CHECKBOX_SIZE]
 				if ((j < 4) and (i==0)) or ((j == 4) and (i==1)):
-					if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
+					if (np.sum(crop) > CHECKBOX_THRESH) and (np.sum(crop) > max_test):
 						max_test = np.sum(crop)
 						i_max = i
 						j_max = j
@@ -207,9 +203,9 @@ def get_answers(dst, q):
 		j_max = -1
 		for i, x in enumerate(f_x_dims):
 			for j, y in enumerate(f_y_dims):
-				crop = dst[y:y+INTERVAL, x:x+INTERVAL]
+				crop = dst[y:y+CHECKBOX_SIZE, x:x+CHECKBOX_SIZE]
 				if (i < 1) or ((i == 1) and (j == 0)) or ((i == 3) and (j == 0)) or ((i == 2) and (j == 1)):
-					if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
+					if (np.sum(crop) > CHECKBOX_THRESH) and (np.sum(crop) > max_test):
 						max_test = np.sum(crop)
 						i_max = i
 						j_max = j
@@ -237,9 +233,9 @@ def get_answers(dst, q):
 		j_max = -1
 		for i, x in enumerate(f_x_dims):
 			for j, y in enumerate(f_y_dims):
-				crop = dst[y:y+INTERVAL, x:x+INTERVAL]
+				crop = dst[y:y+CHECKBOX_SIZE, x:x+CHECKBOX_SIZE]
 				if (j < 5):
-					if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
+					if (np.sum(crop) > CHECKBOX_THRESH) and (np.sum(crop) > max_test):
 						max_test = np.sum(crop)
 						i_max = i
 						j_max = j
@@ -266,9 +262,9 @@ def get_answers(dst, q):
 		j_max = -1
 		for i, x in enumerate(f_x_dims):
 			for j, y in enumerate(f_y_dims):
-				crop = dst[y:y+INTERVAL, x:x+INTERVAL]
+				crop = dst[y:y+CHECKBOX_SIZE, x:x+CHECKBOX_SIZE]
 				if (j < 3):
-					if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
+					if (np.sum(crop) > CHECKBOX_THRESH) and (np.sum(crop) > max_test):
 						max_test = np.sum(crop)
 						i_max = i
 						j_max = j
@@ -293,9 +289,9 @@ def get_answers(dst, q):
 		j_max = -1
 		for i, x in enumerate(f_x_dims):
 			for j, y in enumerate(f_y_dims):
-				crop = dst[y:y+INTERVAL, x:x+INTERVAL]
+				crop = dst[y:y+CHECKBOX_SIZE, x:x+CHECKBOX_SIZE]
 				if (j < 5):
-					if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
+					if (np.sum(crop) > CHECKBOX_THRESH) and (np.sum(crop) > max_test):
 						max_test = np.sum(crop)
 						i_max = i
 						j_max = j
@@ -324,9 +320,9 @@ def get_answers(dst, q):
 		j_max = -1
 		for i, x in enumerate(f_x_dims):
 			for j, y in enumerate(f_y_dims):
-				crop = dst[y:y+INTERVAL, x:x+INTERVAL]
+				crop = dst[y:y+CHECKBOX_SIZE, x:x+CHECKBOX_SIZE]
 				if (j < 3):
-					if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
+					if (np.sum(crop) > CHECKBOX_THRESH) and (np.sum(crop) > max_test):
 						max_test = np.sum(crop)
 						i_max = i
 						j_max = j
@@ -351,9 +347,9 @@ def get_answers(dst, q):
 		j_max = -1
 		for i, x in enumerate(f_x_dims):
 			for j, y in enumerate(f_y_dims):
-				crop = dst[y:y+INTERVAL, x:x+INTERVAL]
+				crop = dst[y:y+CHECKBOX_SIZE, x:x+CHECKBOX_SIZE]
 				if (j < 2) or ((j == 2) and (i==0)):
-					if (np.sum(crop) > PIXEL_THRESHOLD) and (np.sum(crop) > max_test):
+					if (np.sum(crop) > CHECKBOX_THRESH) and (np.sum(crop) > max_test):
 						max_test = np.sum(crop)
 						i_max = i
 						j_max = j

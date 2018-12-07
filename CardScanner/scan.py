@@ -1,17 +1,4 @@
 import pyinsane2
-# import psycopg2
-import os
-import sys
-import django
-import cv2
-import numpy as np
-from math import floor
-from . import read, process
-
-sys.path.append('/home/cddl/Desktop/nextstop/nextstop')
-os.environ["DJANGO_SETTINGS_MODULE"] = 'nextstop.settings'
-django.setup()
-from survey.models import Response, Question, Answer, Survey
 
 def setup():
     pyinsane2.init()
@@ -24,11 +11,6 @@ def setup():
         # Set scan resolution
         pyinsane2.set_scanner_opt(device, 'resolution', [200])
         pyinsane2.set_scanner_opt(device, 'MultifeedDetection', [1])
-        # set scanner dimensions
-        # pyinsane2.set_scanner_opt(devicfe, 'tl-x', [0])
-        # pyinsane2.set_scanner_opt(device, 'tl-y', [0])
-        # pyinsane2.set_scanner_opt(device, 'br-x', [floor(215.88)])
-        # pyinsane2.set_scanner_opt(device, 'br-y', [floor((1218 / 2795) * 3556)])
         # Set scan area
         pyinsane2.maximize_scan_area(device)
         try:

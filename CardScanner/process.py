@@ -1,10 +1,7 @@
 from PIL import Image, ImageChops
 import numpy as np
 import cv2
-
-MAX_FEATURES = 800
-GOOD_MATCH_PERCENT = 0.05
-COLOR_WINDOW = 25
+from . import MAX_FEATURES, GOOD_MATCH_PERCENT, FRONT_MASK_COLOR_WINDOW
 
 def rotate(dst):
     (h, w) = dst.shape[:2]
@@ -117,7 +114,7 @@ def mask_front(img, b, color):
     col = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     blur = cv2.blur(col,(b, b))
     mask_white = cv2.inRange(blur, white_hsv[0], white_hsv[1])
-    mask_color = cv2.inRange(blur, color - COLOR_WINDOW, color + COLOR_WINDOW)
+    mask_color = cv2.inRange(blur, color - FRONT_MASK_COLOR_WINDOW, color + FRONT_MASK_COLOR_WINDOW)
     mask = cv2.bitwise_or(mask_color, mask_white)
     mask = cv2.bitwise_not(mask)
     return cv2.bitwise_and(blur, blur, mask=mask)

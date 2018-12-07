@@ -6,8 +6,6 @@ import cv2
 import numpy as np
 from math import floor
 
-# images_hsv = [cv2.cvtColor(np.array(i), cv2.COLOR_BGR2HSV) for i in images]
-
 from os import listdir
 import glob
 
