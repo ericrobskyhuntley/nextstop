@@ -1,4 +1,4 @@
-from CardScanner import scan, process, dims, read
+from CardScanner import scan, process, read
 import schedule
 import time
 from os import listdir
@@ -6,11 +6,68 @@ import cv2
 import numpy as np
 from math import floor
 
+# images_hsv = [cv2.cvtColor(np.array(i), cv2.COLOR_BGR2HSV) for i in images]
+
+from os import listdir
+import glob
+
+front_list = glob.glob("scans/*front*")
+front_list = sorted(front_list, key=str.lower)
+
+for front_file in front_list:
+    print(front_file)
+    front = cv2.imread(front_file)
+    corners = read.get_corners(front)
+    question = read.get_question(corners)
+    if question is not None:
+        print(question[0])
+        masked = process.mask_front(front, 2,  question[1])
+        answers = read.get_answers(masked, question[0])
+        print(answers)
+
+from PIL import Image, ImageChops
 DEVICE = scan.setup()
 images = scan.scan_cards(DEVICE)
+
+cv2.imwrite('test.png', image)
+
+images[0].model
+images[0].size
+
+def bg_trim(im):
+    """
+    Function to programmatically crop card to edge.
+    `im` is a PIL Image Object.
+    """
+    # This initial crop is hacky and stupid (should just be able to set device
+    # options) but scanner isn't 'hearing' those settings.
+    # im = im.crop((420, 0, 1275, 1200))
+    from_corner = 25
+    box_size = 10
+    image = np.array(images[0])
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    tl_hsv = hsv[from_corner:from_corner+box_size, from_corner:from_corner+box_size]
+    tl_hsv = np.median(tl_hsv, axis=0)
+    tl_hsv = np.median(tl_hsv, axis=0)
+    # color = tuple(map(int, tl_hsv))
+    white_hsv = [(0,0,180),(180, 15, 255)]
+    mask_white = cv2.inRange(hsv, white_hsv[0], white_hsv[1])
+    mask_color = cv2.inRange(hsv, tl_hsv - 15, tl_hsv + 15)
+    mask = cv2.bitwise_or(mask_color, mask_white)
+    mask = cv2.bitwise_not(mask)
+    masked = cv2.bitwise_and(hsv, hsv, mask=mask)
+    cv2.imwrite('test_masked.jpg', masked)
+    # bg = Image.new('HSV', images[0].size, color)
+    # diff = ImageChops.difference(im, bg)
+    # diff = ImageChops.add(diff, diff, 2.0, -100)
+    bbox = masked.getbbox()
+    if bbox:
+        return im.crop(bbox)
+
+image_crop = bg_trim(images[0])
+
 images = [process.bg_trim(i) for i in images]
 images = [cv2.cvtColor(np.array(i), cv2.COLOR_BGR2RGB) for i in images]
-# images_hsv = [cv2.cvtColor(np.array(i), cv2.COLOR_BGR2HSV) for i in images]
 
 for i in range(0, len(images), 2):
     # card_no = floor(i/2) + 67

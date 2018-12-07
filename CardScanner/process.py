@@ -1,14 +1,9 @@
-import pyinsane2
 from PIL import Image, ImageChops
-# from CardReader import cr
-from math import floor
 import numpy as np
 import cv2
-import datetime
 
 MAX_FEATURES = 800
 GOOD_MATCH_PERCENT = 0.05
-
 COLOR_WINDOW = 25
 
 def rotate(dst):
@@ -119,15 +114,6 @@ def mask_front(img, b, color):
     """
     Process image
     """
-    # img = cv2.imread(path)
-    # if (side == 'b'):
-    #     gray = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    #     blur = cv2.blur(gray,(b, b))
-    #     mask_white = cv2.inRange(blur, white_hsv[0], white_hsv[1])
-    #     mask_black = cv2.inRange(blur, black_hsv[0], black_hsv[1])
-    #     mask = cv2.bitwise_or(mask_white, mask_black)
-        # mask_inv = cv2.bitwise_or(mask_black, mask_white)
-    # elif (side == 'f'):
     col = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     blur = cv2.blur(col,(b, b))
     mask_white = cv2.inRange(blur, white_hsv[0], white_hsv[1])
