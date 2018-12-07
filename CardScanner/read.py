@@ -2,10 +2,7 @@ import cv2
 import numpy as np
 
 INTERVAL = 23
-IMG_PATH = ''
 PIXEL_THRESHOLD = 300
-FRONT_BLUR = 3
-BACK_BLUR = 1
 COLOR_WINDOW = 15
 
 QUESTION_HUES = [
@@ -31,27 +28,23 @@ QUESTION_HUES = [
     (14, np.array([13, 250, 243])),
 ]
 
-def get_corners(dst):
+def get_corners(img):
     from_corner = 25
     box_size = 10
-    hsv = cv2.cvtColor(dst, cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(img, axis=0), cv2.COLOR_BGR2HSV)
     d = dict()
     d['height'], d['width'] = dst.shape[:2]
     tl_hsv = hsv[from_corner:from_corner+box_size+75, from_corner:from_corner+box_size+75]
-    tl_hsv = np.median(tl_hsv, axis=0)
-    tl_hsv = np.median(tl_hsv, axis=0)
+    tl_hsv = np.median(np.median(tl_hsv, axis=0), axis=0)
     d['tl_hsv'] = tl_hsv
     tr_hsv = hsv[from_corner:from_corner+box_size+75, d['width']-from_corner-box_size-75:d['width']-from_corner]
-    tr_hsv = np.median(tr_hsv, axis=0)
-    tr_hsv = np.median(tr_hsv, axis=0)
+    tr_hsv = np.median(np.median(tr_hsv, axis=0), axis=0)
     d['tr_hsv'] = tr_hsv
     bl_hsv = hsv[d['height']-from_corner-box_size:d['height']-from_corner, from_corner:from_corner + box_size]
-    bl_hsv = np.median(bl_hsv, axis=0)
-    bl_hsv = np.median(bl_hsv, axis=0)
+    bl_hsv = np.median(np.median(bl_hsv, axis=0), axis=0)
     d['bl_hsv'] = bl_hsv
     br_hsv = hsv[d['height']-from_corner-box_size:d['height']-from_corner, d['width']-from_corner-box_size:d['width']-from_corner]
-    br_hsv = np.median(br_hsv, axis=0)
-    br_hsv = np.median(br_hsv, axis=0)
+    br_hsv = np.median(np.median(br_hsv, axis=0), axis=0)
     d['br_hsv'] = br_hsv
     med = np.median(np.array([tl_hsv, tr_hsv, bl_hsv, br_hsv]), axis=0)
     d['med'] = med
@@ -64,11 +57,8 @@ def get_question(hsv):
     q = None
     for value in possible_values:
         for question in QUESTION_HUES:
-            # q_hsv = q_hsv[1]
             lower_bound = question[1] - COLOR_WINDOW
             upper_bound = question[1] + COLOR_WINDOW
-            # print(lower_bound, value, upper_bound)
-            # print(lower_bound, hsv, upper_bound)
             if np.all(value > lower_bound) and np.all(value < upper_bound):
                 q = question
     return q
@@ -193,18 +183,18 @@ def get_answers(dst, q):
 						i_max = i
 						j_max = j
 		if (i_max==0) & (j_max==0):
-			return 50 # parking spots into parks
+			return [50] # parking spots into parks
 		elif (i_max==0) & (j_max==1):
-			return 51 # streets are for robots
+			return [51] # streets are for robots
 		elif (i_max==0) & (j_max==2):
-			return 52 # garages house grandmas
+			return [52] # garages house grandmas
 		elif (i_max==0) & (j_max==3):
-			return 53 # parking lots urban farms
+			return [53] # parking lots urban farms
 		elif (i_max==1) & (j_max==4):
-			return 23 # O T H E R
+			return [23] # O T H E R
 		else:
 			# print(max_test)
-			return None
+			return []
 	elif (q == 14):
 		"""
 		Travel in the future will be more dangerous for...
@@ -224,18 +214,18 @@ def get_answers(dst, q):
 						i_max = i
 						j_max = j
 		if (i_max==0) & (j_max==0):
-			return 54 # pedestrians
+			return [54] # pedestrians
 		elif (i_max==0) & (j_max==1):
-			return 57 # stray cats
+			return [57] # stray cats
 		elif (i_max==1) & (j_max==0):
-			return 55 # drivers
+			return [55] # drivers
 		elif (i_max==3) & (j_max==0):
-			return 56 # bikers
+			return [56] # bikers
 		elif (i_max==2) & (j_max==1):
-			return 23 # O T H E R
+			return [23] # O T H E R
 		else:
 			# print(max_test)
-			return None
+			return []
 	elif (q == 6):
 		"""
 		Responsibility for autonomous vehicle accidents belongs to...
@@ -254,17 +244,17 @@ def get_answers(dst, q):
 						i_max = i
 						j_max = j
 		if (i_max==0) & (j_max==0):
-			return 24 # car maker
+			return [24] # car maker
 		elif (i_max==0) & (j_max==1):
-			return 25 # software dev
+			return [25] # software dev
 		elif (i_max==0) & (j_max==2):
-			return 27 # insurance co
+			return [27] # insurance co
 		elif (i_max==0) & (j_max==3):
-			return 28 # av owner
+			return [28] # av owner
 		elif (i_max==0) & (j_max==4):
-			return 58 # user at time
+			return [58] # user at time
 		else:
-			return None
+			return []
 	elif (q == 10):
 		"""
 		In the future, my transportation costs will...
@@ -283,14 +273,14 @@ def get_answers(dst, q):
 						i_max = i
 						j_max = j
 		if (i_max==0) & (j_max==0):
-			return 38 # increase
+			return [38] # increase
 		elif (i_max==0) & (j_max==1):
-			return 39 # decrease
+			return [39] # decrease
 		elif (i_max==0) & (j_max==2):
-			return 40 # stay about the same
+			return [40] # stay about the same
 		else:
 			# print(max_test)
-			return None
+			return []
 	elif (q == 7):
 		"""
 		In 2040, commuting will take...
@@ -310,18 +300,18 @@ def get_answers(dst, q):
 						i_max = i
 						j_max = j
 		if (i_max==0) & (j_max==0):
-			return 30 # less time
+			return [30] # less time
 		elif (i_max==0) & (j_max==1):
-			return 31 # no add time
+			return [31] # no add time
 		elif (i_max==0) & (j_max==2):
-			return 32 # up to 30 more
+			return [32] # up to 30 more
 		elif (i_max==0) & (j_max==3):
-			return 33 # 30 - 60 more
+			return [33] # 30 - 60 more
 		elif (i_max==0) & (j_max==4):
-			return 34 # 60+ more
+			return [34] # 60+ more
 		else:
 			# print(max_test)
-			return None
+			return []
 	elif (q == 9):
 		"""
 		The future of mobility will make the world...
@@ -341,14 +331,14 @@ def get_answers(dst, q):
 						i_max = i
 						j_max = j
 		if (i_max==0) & (j_max==0):
-			return 60 # more fair/equitable
+			return [60] # more fair/equitable
 		elif (i_max==0) & (j_max==1):
-			return 61 # less fair/equitable
+			return [61] # less fair/equitable
 		elif (i_max==0) & (j_max==2):
-			return 62 # no more or no less equitable
+			return [62] # no more or no less equitable
 		else:
 			# print(max_test)
-			return None
+			return []
 	elif (q == 12):
 		"""
 		Future mobility options will have the greatest impact on...
@@ -368,15 +358,15 @@ def get_answers(dst, q):
 						i_max = i
 						j_max = j
 		if (i_max==0) & (j_max==0):
-			return 41 # truck drivers
+			return [41] # truck drivers
 		elif (i_max==0) & (j_max==1):
-			return 42 # bike delivery people
+			return [42] # bike delivery people
 		elif (i_max==0) & (j_max==2):
-			return 63 # mass transit drivers
+			return [63] # mass transit drivers
 		elif (i_max==0) & (j_max==3):
-			return 43 # taxi drivers
+			return [43] # taxi drivers
 		else:
 			# print(max_test)
-			return None
+			return []
 	else:
-		return None
+		return []
