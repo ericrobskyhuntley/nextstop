@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from CardScanner import CHECKBOX_SIZE, CHECKBOX_THRESH, Q_COLOR_WINDOW, QUESTION_HUES, TEMPLATE_DIR, ALIGNED_DIR, SERVER_URL, process
+from CardScanner import PROJ_DATA_DIR,CHECKBOX_SIZE, CHECKBOX_THRESH, Q_COLOR_WINDOW, QUESTION_HUES, TEMPLATE_DIR, ALIGNED_DIR, SERVER_URL, process
 from glob import glob
 import os
 import json
@@ -359,7 +359,7 @@ def get_file_list(dir):
 
 def read_from_disk(list):
     # print(card_no)
-    with open('read.json', 'w') as f:
+    with open(PROJ_DATA_DIR+'read.json', 'w') as f:
         for i in range(0, len(list), 2):
             # print(list[i])
             front_idx = i

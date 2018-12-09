@@ -14,7 +14,6 @@ while True:
         images = scan.scan_cards()
         images = [scan.bg_trim(img) for img in images]
         scan.save_ab(images)
-        images.free_all()
     except:
         print("No paper loaded.")
     if time.time() > start + MUSEUM_DAY_IN_SECONDS :
