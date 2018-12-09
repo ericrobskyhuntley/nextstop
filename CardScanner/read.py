@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from . import CHECKBOX_SIZE, CHECKBOX_THRESH, Q_COLOR_WINDOW, QUESTION_HUES, ALIGNED_DIR, SERVER_URL, process
+from CardScanner import CHECKBOX_SIZE, CHECKBOX_THRESH, Q_COLOR_WINDOW, QUESTION_HUES, ALIGNED_DIR, SERVER_URL, process
 from glob import glob
 import os
 import json
@@ -359,7 +359,7 @@ def read_from_disk(list):
     # print(card_no)
     with open('read.json', 'w') as f:
         for i in range(0, len(list), 2):
-            print(list[i])
+            # print(list[i])
             front_idx = i
             back_idx = i + 1
             tz = pytz.timezone('America/New_York')
@@ -389,7 +389,7 @@ def read_from_disk(list):
             # print(question)
             if question is not None:
                 front_file = os.path.basename(list[front_idx]).replace('a','front').replace('b','front')
-                back_file = os.path.basename(list[front_idx]).replace('a','back').replace('b','back')
+                back_file = os.path.basename(list[back_idx]).replace('a','back').replace('b','back')
                 ref_front = cv2.imread('nextstop/static/templates/11_28_{:02}_front.jpg'.format(question[0]))
                 ref_h, ref_w = ref_front.shape[0], ref_front.shape[1]
                 ref_front = ref_front[0+25:ref_h-25, 0+25:ref_w-25]
@@ -398,20 +398,21 @@ def read_from_disk(list):
                 cv2.imwrite(ALIGNED_DIR+back_file, back)
                 masked = process.mask_front(aligned_front, 2,  question[1])
                 answers = get_answers(masked, question[0])
-                # print(answers)
-                print(str(timestamp))
-                f.write(json.dumps({
-                    'id': str(uuid.uuid4()),
-                    'q': question[0],
-                    'a': answers,
-                    'gender': '',
-                    'age': '',
-                    'zip_code': '',
-                    'home': '',
-                    'free_q_id': 2,
-                    'free_resp': '',
-                    'survey_id': 6,
-                    'front': SERVER_URL + front_file,
-                    'back': SERVER_URL + back_file,
-                    'timestamp': str(timestamp)
-                }, default=str) + "\n")
+                if len(answers) > 0:
+                    # print(answers)
+                    print(str(timestamp))
+                    f.write(json.dumps({
+                        'id': str(uuid.uuid4()),
+                        'q_id': question[0],
+                        'a_id': answers,
+                        'gender': '',
+                        'age': '',
+                        'zip_code': '',
+                        'home': '',
+                        'free_q_id': 2,
+                        'free_resp': '',
+                        'survey_id': 6,
+                        'front': SERVER_URL + front_file,
+                        'back': SERVER_URL + back_file,
+                        'timestamp': timestamp
+                    }, default=str) + "\n")

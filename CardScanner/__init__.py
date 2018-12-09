@@ -8,7 +8,7 @@ CHECKBOX_SIZE = 23
 CHECKBOX_THRESH = 300
 Q_COLOR_WINDOW = 15
 
-SCAN_DIR = '/home/cddl/scans/'
+SCAN_DIR = '/home/cddl/scans/raw/'
 ARCHIVE_DIR = '/home/cddl/scans/archive/'
 ALIGNED_DIR = '/home/cddl/scans/aligned/'
 SERVER_URL = '/static/cards/exhibit/'
