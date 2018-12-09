@@ -86,25 +86,6 @@ def align_images_ecc(im, ref):
         im_align = cv2.warpAffine(im, warp_matrix, (sz[1],sz[0]), flags=cv2.INTER_LINEAR + cv2.WARP_INVERSE_MAP)
     return im_align
 
-def bg_trim(im):
-    """
-    Function to programmatically crop card to edge.
-    `im` is a PIL Image Object.
-    """
-    # This initial crop is hacky and stupid (should just be able to set device
-    # options) but scanner isn't 'hearing' those settings.
-    # w,h = im.size
-    im = im.crop((443, 0, 1242, 1200))
-    # bg = Image.new(im.mode, im.size, im.getpixel((2, 2)))
-    # diff = ImageChops.difference(im, bg)
-    # diff = ImageChops.add(diff, diff, 2.0, -100)
-    # bbox = diff.getbbox()
-    return im
-    # if bbox:
-    #     return im
-    # else:
-    #     print("There's been a problem.")
-
 white_hsv = [(0,0,180),(180, 15, 255)]
 black_hsv = [(0,0,0),(180, 255, 100)]
 
