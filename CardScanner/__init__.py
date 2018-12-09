@@ -12,8 +12,8 @@ SCAN_DIR = '/home/cddl/scans/raw/'
 ARCHIVE_DIR = '/home/cddl/scans/archive/'
 ALIGNED_DIR = '/home/cddl/scans/aligned/'
 SERVER_URL = '/static/cards/exhibit/'
-
-MUSEUM_DAY_IN_SECONDS = 48600
+TEMPLATE_DIR = '/home/cddl/scans/templates/'
+MUSEUM_DAY_IN_SECONDS = 75
 
 PSQL_PASSWORD = os.environ.get('PSQL_PASSWORD')
 

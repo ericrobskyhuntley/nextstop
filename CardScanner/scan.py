@@ -1,12 +1,14 @@
 import pyinsane2
-from . import read, SCAN_DIR
+from math import floor
+from . import read, SCAN_DIR, ARCHIVE_DIR
 
-def setup():
+def scan_cards():
     pyinsane2.init()
     devices = pyinsane2.get_devices()
     try:
         assert(len(devices) > 0)
         device = devices[0]
+        print(f'PyInsane2 initiatied using {device.name}.')
         # device.options['AutoDocumentSize']
         # Specify color scanning
         pyinsane2.set_scanner_opt(device, 'mode', ['24bit Color[Fast]'])
@@ -17,31 +19,34 @@ def setup():
             pyinsane2.set_scanner_opt(device, 'source', ['Automatic Document Feeder(center aligned,Duplex)'])
         except pyinsane2.PyinsaneException as e:
             print('No document feeder found', e)
-        print(f'PyInsane2 initiatied using {device.name}.')
+        try:
+            scan_session = device.scan(multiple=True)
+            print("Scanning ...")
+            while True:
+                try:
+                    scan_session.scan.read()
+                except EOFError:
+                    print ('scanning page')
+        except StopIteration:
+            im_list = scan_session.images
+            pyinsane2.exit()
+            return im_list
+        # print(pyinsane2.sane.rawapi.SaneStatus)
         return device
     except AssertionError:
         print("no scanners found")
         pyinsane2.exit()
 
-def scan_cards(device):
-    try:
-        scan_session = device.scan(multiple=True)
-        print("Scanning ...")
-        while True:
-            try:
-                scan_session.scan.read()
-            except EOFError:
-                print ("hi!")
-    except StopIteration:
-        im_list = scan_session.images
-        pyinsane2.exit()
-        return im_list
-
 def save_ab(image_list):
+    print(range(0, len(image_list), 2))
+    print('hello')
     start_no = floor(len(read.get_file_list(SCAN_DIR + "*png"))/2)
     archive_no = floor(len(read.get_file_list(ARCHIVE_DIR + "*png"))/2)
+    print(start_no, archive_no)
     for i in range(0, len(image_list), 2):
+        # print(i)
         image_list[i].save(SCAN_DIR+"{:06}-a.png".format(floor(i/2 + start_no+archive_no)))
+        # print("testing")
         image_list[i+1].save(SCAN_DIR+"{:06}-b.png".format(floor(i/2 + start_no+archive_no)))
 
 def bg_trim(im):

@@ -1,12 +1,14 @@
 import cv2
 import numpy as np
-from CardScanner import CHECKBOX_SIZE, CHECKBOX_THRESH, Q_COLOR_WINDOW, QUESTION_HUES, ALIGNED_DIR, SERVER_URL, process
+from CardScanner import CHECKBOX_SIZE, CHECKBOX_THRESH, Q_COLOR_WINDOW, QUESTION_HUES, TEMPLATE_DIR, ALIGNED_DIR, SERVER_URL, process
 from glob import glob
 import os
 import json
 import uuid
 from datetime import datetime
 import pytz
+from scipy.misc import bytescale
+from PIL import Image
 
 def get_corners(img):
     t_from_corner = 100
@@ -386,16 +388,18 @@ def read_from_disk(list):
             corners = get_corners(front)
             # print(corners)
             question = get_question(corners)
+            print(question)
             # print(question)
             if question is not None:
-                front_file = os.path.basename(list[front_idx]).replace('a','front').replace('b','front')
-                back_file = os.path.basename(list[back_idx]).replace('a','back').replace('b','back')
-                ref_front = cv2.imread('nextstop/static/templates/11_28_{:02}_front.jpg'.format(question[0]))
+                front_file = os.path.basename(list[front_idx]).replace('-a.png','-front.jpg').replace('-b.png','-front.jpg')
+                back_file = os.path.basename(list[back_idx]).replace('-a.png','-back.jpg').replace('-b.png','-back.jpg')
+                ref_front = cv2.imread(TEMPLATE_DIR+'{:02}_front.jpg'.format(question[0]))
                 ref_h, ref_w = ref_front.shape[0], ref_front.shape[1]
+                print(front_file, back_file)
                 ref_front = ref_front[0+25:ref_h-25, 0+25:ref_w-25]
                 aligned_front = process.align_images_orb(front, ref_front)
-                cv2.imwrite(ALIGNED_DIR+front_file, aligned_front)
-                cv2.imwrite(ALIGNED_DIR+back_file, back)
+                cv2.imwrite(ALIGNED_DIR+front_file, aligned_front, [int(cv2.IMWRITE_JPEG_QUALITY), 60])
+                cv2.imwrite(ALIGNED_DIR+back_file, back, [int(cv2.IMWRITE_JPEG_QUALITY), 60])
                 masked = process.mask_front(aligned_front, 2,  question[1])
                 answers = get_answers(masked, question[0])
                 if len(answers) > 0:
