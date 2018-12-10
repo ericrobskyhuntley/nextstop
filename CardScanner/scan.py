@@ -6,7 +6,6 @@ def scan_cards():
     pyinsane2.init()
     devices = pyinsane2.get_devices()
     try:
-        assert(len(devices) > 0)
         device = devices[0]
         print(f'PyInsane2 initiatied using {device.name}.')
         # device.options['AutoDocumentSize']
@@ -32,9 +31,7 @@ def scan_cards():
             pyinsane2.exit()
             return im_list
         # print(pyinsane2.sane.rawapi.SaneStatus)
-        return device
-    except AssertionError:
-        print("no scanners found")
+    except:
         pyinsane2.exit()
 
 def save_ab(image_list):

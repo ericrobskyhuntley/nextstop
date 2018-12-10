@@ -9,16 +9,15 @@ CHECKBOX_THRESH = 300
 Q_COLOR_WINDOW = 15
 
 PROJ_DATA_DIR = '/home/cddl/scans/'
-SCAN_DIR = '/home/cddl/scans/raw/'
-ARCHIVE_DIR = '/home/cddl/scans/archive/'
-ALIGNED_DIR = '/home/cddl/scans/aligned/'
+SCAN_DIR = PROJ_DATA_DIR + 'raw/'
+ARCHIVE_DIR = PROJ_DATA_DIR + 'archive/'
+ALIGNED_DIR = PROJ_DATA_DIR + 'aligned/'
 SERVER_URL = '/static/cards/exhibit/'
-TEMPLATE_DIR = '/home/cddl/scans/templates/'
-# MUSEUM_DAY_IN_SECONDS = 32395
-MUSEUM_DAY_IN_SECONDS = 10
+TEMPLATE_DIR = PROJ_DATA_DIR + 'templates/'
+MUSEUM_DAY_IN_SECONDS = 32395
+# MUSEUM_DAY_IN_SECONDS = 600
 
 PSQL_PASSWORD = os.environ.get('PSQL_PASSWORD')
-
 # x, y
 QUESTION_HUES = [
     # 4: My preferred transport mode(s) in 2020 will be...

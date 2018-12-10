@@ -15,7 +15,7 @@ while True:
         images = [scan.bg_trim(img) for img in images]
         scan.save_ab(images)
     except:
-        print("No paper loaded.")
+        print("No paper loaded2.")
     if time.time() > start + MUSEUM_DAY_IN_SECONDS :
         list = read.get_file_list(SCAN_DIR + '*.png')
         read.read_from_disk(list)
