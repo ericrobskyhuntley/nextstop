@@ -17,7 +17,7 @@ while True:
     except:
         print("No paper loaded.")
     now_hour = datetime.now(pytz.timezone('America/New_York')).hour
-    if now_hour > 22 :
+    if now_hour >= 22 :
         list = read.get_file_list(SCAN_DIR + '*.png')
         read.read_from_disk(list)
         break
