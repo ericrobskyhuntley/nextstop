@@ -16,7 +16,6 @@ SERVER_URL = '/static/cards/exhibit/'
 TEMPLATE_DIR = PROJ_DATA_DIR + 'templates/'
 MUSEUM_DAY_IN_SECONDS = 49500
 
-PSQL_PASSWORD = os.environ.get('PSQL_PASSWORD')
 # x, y
 QUESTION_HUES = [
     # 4: My preferred transport mode(s) in 2020 will be...
