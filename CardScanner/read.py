@@ -11,7 +11,7 @@ from scipy.misc import bytescale
 from PIL import Image
 
 def get_corners(img):
-    t_from_corner = 100
+    t_from_corner = 25
     b_from_corner = 25
     box_size = 10
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
