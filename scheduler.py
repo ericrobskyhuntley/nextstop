@@ -8,8 +8,8 @@ import objgraph
 import pytz
 
 while True:
-    print('Memory usage: %s (kb)' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
-    objgraph.show_most_common_types()
+    # print('Memory usage: %s (kb)' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+    # objgraph.show_most_common_types()
     try:
         images = scan.scan_cards()
         images = [scan.bg_trim(img) for img in images]
@@ -18,6 +18,6 @@ while True:
         print("No paper loaded.")
     now_hour = datetime.now(pytz.timezone('America/New_York')).hour
     if now_hour >= 22 :
-        list = read.get_file_list(SCAN_DIR + '*.png')
-        read.read_from_disk(list)
+        scan_list = read.get_file_list(SCAN_DIR + '*.png')
+        read.read_from_disk(scan_list)
         break

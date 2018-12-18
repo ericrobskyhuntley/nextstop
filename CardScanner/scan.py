@@ -38,7 +38,7 @@ def save_ab(image_list):
     print(range(0, len(image_list), 2))
     print('hello')
     start_no = floor(len(read.get_file_list(SCAN_DIR + "*png"))/2)
-    archive_no = floor(len(read.get_file_list(ARCHIVE_DIR + "*png"))/2)
+    archive_no = floor(len(read.get_file_list(ARCHIVE_DIR + "*jpg"))/2)
     print(start_no, archive_no)
     for i in range(0, len(image_list), 2):
         # print(i)
