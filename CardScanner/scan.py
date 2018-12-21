@@ -1,6 +1,6 @@
 import pyinsane2
 from math import floor
-from . import read, SCAN_DIR, ARCHIVE_DIR
+from . import read, SCAN_DIR
 
 def scan_cards():
     pyinsane2.init()
@@ -30,21 +30,14 @@ def scan_cards():
             im_list = scan_session.images
             pyinsane2.exit()
             return im_list
-        # print(pyinsane2.sane.rawapi.SaneStatus)
     except:
         pyinsane2.exit()
 
 def save_ab(image_list):
-    print(range(0, len(image_list), 2))
-    print('hello')
     start_no = floor(len(read.get_file_list(SCAN_DIR + "*png"))/2)
-    archive_no = floor(len(read.get_file_list(ARCHIVE_DIR + "*jpg"))/2)
-    print(start_no, archive_no)
     for i in range(0, len(image_list), 2):
-        # print(i)
-        image_list[i].save(SCAN_DIR+"{:06}-a.png".format(floor(i/2 + start_no+archive_no)))
-        # print("testing")
-        image_list[i+1].save(SCAN_DIR+"{:06}-b.png".format(floor(i/2 + start_no+archive_no)))
+        image_list[i].save(SCAN_DIR+"{:06}-a.png".format(floor(i/2 + start_no)))
+        image_list[i+1].save(SCAN_DIR+"{:06}-b.png".format(floor(i/2 + start_no)))
 
 def bg_trim(im):
     """

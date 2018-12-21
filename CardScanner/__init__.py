@@ -10,11 +10,12 @@ Q_COLOR_WINDOW = 15
 
 PROJ_DATA_DIR = '/home/cddl/scans/'
 SCAN_DIR = PROJ_DATA_DIR + 'raw/'
-ARCHIVE_DIR = PROJ_DATA_DIR + 'archive/'
-ALIGNED_DIR = PROJ_DATA_DIR + 'aligned/'
+
 SERVER_URL = '/static/cards/exhibit/'
-TEMPLATE_DIR = PROJ_DATA_DIR + 'templates/'
-MUSEUM_DAY_IN_SECONDS = 49500
+SERVER_DATA_DIR = '/home/ehuntley/scans/'
+SERVER_RAW = SERVER_DATA_DIR + 'raw/'
+SERVER_PROCESSED = '/home/ehuntley/www/nextstop/static/cards/exhibit/test/'
+SERVER_TEMPLATES = SERVER_DATA_DIR + 'templates/'
 
 # x, y
 QUESTION_HUES = [

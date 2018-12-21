@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from CardScanner import PROJ_DATA_DIR,CHECKBOX_SIZE, CHECKBOX_THRESH, Q_COLOR_WINDOW, QUESTION_HUES, TEMPLATE_DIR, ALIGNED_DIR, SERVER_URL, process
+from CardScanner import PROJ_DATA_DIR,CHECKBOX_SIZE, CHECKBOX_THRESH, Q_COLOR_WINDOW, QUESTION_HUES, SERVER_TEMPLATES, SERVER_DATA_DIR, SERVER_RAW, SERVER_URL, SERVER_PROCESSED, process
 from glob import glob
 import os
 import json
@@ -359,7 +359,7 @@ def get_file_list(dir):
 
 def read_from_disk(list):
     # print(card_no)
-    with open(PROJ_DATA_DIR+'read.json', 'w') as f:
+    with open(SERVER_DATA_DIR+'read.json', 'w') as f:
         for i in range(0, len(list), 2):
             # print(list[i])
             front_idx = i
@@ -390,16 +390,16 @@ def read_from_disk(list):
             question = get_question(corners)
             print(question)
             # print(question)
+            front_file = os.path.basename(list[front_idx]).replace('-a.png','-front.jpg').replace('-b.png','-front.jpg')
+            back_file = os.path.basename(list[back_idx]).replace('-a.png','-back.jpg').replace('-b.png','-back.jpg')
             if question is not None:
-                front_file = os.path.basename(list[front_idx]).replace('-a.png','-front.jpg').replace('-b.png','-front.jpg')
-                back_file = os.path.basename(list[back_idx]).replace('-a.png','-back.jpg').replace('-b.png','-back.jpg')
-                ref_front = cv2.imread(TEMPLATE_DIR+'{:02}_front.jpg'.format(question[0]))
+                ref_front = cv2.imread(SERVER_TEMPLATES+'{:02}_front.jpg'.format(question[0]))
                 ref_h, ref_w = ref_front.shape[0], ref_front.shape[1]
                 print(front_file, back_file)
                 ref_front = ref_front[0+25:ref_h-25, 0+25:ref_w-25]
                 aligned_front = process.align_images_orb(front, ref_front)
-                cv2.imwrite(ALIGNED_DIR+front_file, aligned_front, [int(cv2.IMWRITE_JPEG_QUALITY), 60])
-                cv2.imwrite(ALIGNED_DIR+back_file, back, [int(cv2.IMWRITE_JPEG_QUALITY), 60])
+                cv2.imwrite(SERVER_PROCESSED+front_file, aligned_front, [int(cv2.IMWRITE_JPEG_QUALITY), 60])
+                cv2.imwrite(SERVER_PROCESSED+back_file, back, [int(cv2.IMWRITE_JPEG_QUALITY), 60])
                 masked = process.mask_front(aligned_front, 2,  question[1])
                 answers = get_answers(masked, question[0])
                 if len(answers) > 0:
@@ -420,3 +420,6 @@ def read_from_disk(list):
                         'back': SERVER_URL + back_file,
                         'timestamp': timestamp
                     }, default=str) + "\n")
+            else:
+                cv2.imwrite(SERVER_PROCESSED+front_file, front, [int(cv2.IMWRITE_JPEG_QUALITY), 60])
+                cv2.imwrite(SERVER_PROCESSED+back_file, back, [int(cv2.IMWRITE_JPEG_QUALITY), 60])
