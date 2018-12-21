@@ -11,4 +11,5 @@ now = datetime.now(tz)
 one_day = timedelta(hours=24)
 last_day_list = [f for f in file_list if ((now - datetime.fromtimestamp(os.path.getmtime(f),tz) <= one_day))]
 # Read, process, and save files; create JSON.
-read.read_from_disk(last_day_list)
+if len(last_day_list) > 0:
+    read.read_from_disk(last_day_list)

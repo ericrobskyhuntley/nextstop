@@ -14,7 +14,7 @@ SCAN_DIR = PROJ_DATA_DIR + 'raw/'
 SERVER_URL = '/static/cards/exhibit/'
 SERVER_DATA_DIR = '/home/ehuntley/scans/'
 SERVER_RAW = SERVER_DATA_DIR + 'raw/'
-SERVER_PROCESSED = '/home/ehuntley/www/nextstop/static/cards/exhibit/test/'
+SERVER_PROCESSED = '/home/ehuntley/www/nextstop/static/cards/exhibit/'
 SERVER_TEMPLATES = SERVER_DATA_DIR + 'templates/'
 
 # x, y
