@@ -3,15 +3,13 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
+from dotenv import load_dotenv
+load_dotenv()
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'cg#p$g+j9tax!#a3cup@1$8obt2_+&k3q+pmu)5%asj6yjpkag')
 
 DEBUG = bool(os.environ.get('DJANGO_DEBUG', True))
-
-ALLOWED_HOSTS = ['ehuntley.media.mit.edu', '18.85.45.120', 'localhost']
-
+ALLOWED_HOSTS = list(os.environ.get('DJANGO_ALLOWED_HOSTS', ['*']))
 
 # Application definition
 
@@ -63,16 +61,14 @@ WSGI_APPLICATION = 'nextstop.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-PSQL_PASSWORD = os.environ.get('PSQL_PASSWORD')
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'nextstop',
-        'USER': 'ehuntley',
-        'PASSWORD': PSQL_PASSWORD,
-        'HOST': '18.85.45.120',
-        'PORT': '5432',
+        'NAME': os.environ.get('PSQL_NAME'),
+        'USER': os.environ.get('PSQL_USER'),
+        'PASSWORD': os.environ.get('PSQL_PASSWORD'),
+        'HOST': os.environ.get('PSQL_HOST'),
+        'PORT': os.environ.get('PSQL_PORT')
     }
 }
 
